@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Мийки цистерн</title>
-  <!-- Google Fonts: Roboto -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -25,24 +26,27 @@
       margin-bottom: 25px;
     }
     .btn {
-      display: inline-block;
-      margin: 12px;
-      padding: 14px 28px;
+      display: block; /* кнопки займають весь доступний простір */
+      width: 80%;
+      max-width: 300px;
+      margin: 12px auto;
+      padding: 16px 0;
       background: #0088cc;
       color: white;
       text-decoration: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 18px;
       font-weight: 500;
       transition: background 0.3s;
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      border: none;
     }
     .btn:hover {
       background: #005f8d;
     }
     #mapBtn {
-      display: none; /* ховаємо кнопку карти */
+      display: none; /* спочатку ховаємо кнопку карти */
     }
   </style>
 </head>
@@ -51,19 +55,18 @@
   <p>Щоб користуватися сайтом, спершу підпишіться на наш Telegram-канал:</p>
 
   <!-- кнопка Telegram -->
-  <a class="btn" href="https://t.me/+HER358IOgOM3YTY0" target="_blank" onclick="unlockMap()">
-    📢 Підписатися на канал
-  </a>
+  <button class="btn" onclick="openTelegram()">📢 Підписатися на канал</button>
 
   <!-- кнопка переходу на карту -->
-  <div>
-    <a id="mapBtn" class="btn" href="map.html">🗺 Перейти до карти</a>
-  </div>
+  <a id="mapBtn" class="btn" href="map.html">🗺 Перейти до карти</a>
 
   <script>
-    function unlockMap() {
-      // показуємо кнопку карти після кліку
-      document.getElementById('mapBtn').style.display = 'inline-block';
+    function openTelegram() {
+      // відкриваємо Telegram у новій вкладці / WebView
+      window.open("https://t.me/+HER358IOgOM3YTY0", "_blank");
+
+      // показуємо кнопку карти
+      document.getElementById('mapBtn').style.display = 'block';
     }
   </script>
 </body>
