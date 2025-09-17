@@ -3,47 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <title>Мийки цистерн</title>
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
       text-align: center;
-      padding: 50px;
+      padding: 40px 20px;
       background: #f8f9fa;
+      margin: 0;
     }
     h1 {
-      color: #333;
+      color: #222;
+      font-size: 22px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    p {
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 25px;
     }
     .btn {
       display: inline-block;
-      margin: 15px;
-      padding: 12px 25px;
+      margin: 12px;
+      padding: 14px 28px;
       background: #0088cc;
       color: white;
       text-decoration: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 500;
       transition: background 0.3s;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
     }
     .btn:hover {
       background: #005f8d;
     }
+    #mapBtn {
+      display: none; /* ховаємо кнопку карти */
+    }
   </style>
 </head>
 <body>
-  <h1>"Мийки цистерн"</h1>
-  <p>Щоб користуватися сайтом, спершу підпишіться на Telegram-канал:</p>
+  <h1>Ласкаво просимо на сайт "Мийки цистерн"</h1>
+  <p>Щоб користуватися сайтом, спершу підпишіться на наш Telegram-канал:</p>
 
   <!-- кнопка Telegram -->
-  <a class="btn" href="https://t.me/+HER358IOgOM3YTY0" target="_blank">
+  <a class="btn" href="https://t.me/+HER358IOgOM3YTY0" target="_blank" onclick="unlockMap()">
     📢 Підписатися на канал
   </a>
 
-  <p>Після підписки відкрийте карту:</p>
-
   <!-- кнопка переходу на карту -->
-  <a class="btn" href="map.html">🗺 Перейти до карти</a>
+  <div>
+    <a id="mapBtn" class="btn" href="map.html">🗺 Перейти до карти</a>
+  </div>
+
+  <script>
+    function unlockMap() {
+      // показуємо кнопку карти після кліку
+      document.getElementById('mapBtn').style.display = 'inline-block';
+    }
+  </script>
 </body>
 </html>
-
-
