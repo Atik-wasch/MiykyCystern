@@ -26,7 +26,7 @@
       margin-bottom: 25px;
     }
     .btn {
-      display: block; /* кнопки займають весь доступний простір */
+      display: block;
       width: 80%;
       max-width: 300px;
       margin: 12px auto;
@@ -45,9 +45,6 @@
     .btn:hover {
       background: #005f8d;
     }
-    #mapBtn {
-      display: none; /* спочатку ховаємо кнопку карти */
-    }
   </style>
 </head>
 <body>
@@ -58,15 +55,12 @@
   <button class="btn" onclick="openTelegram()">📢 Підписатися на канал</button>
 
   <!-- кнопка переходу на карту -->
-  <a id="mapBtn" class="btn" href="map.html">🗺 Перейти до карти</a>
+  <a class="btn" href="map.html">🗺 Перейти до карти</a>
 
   <script>
     function openTelegram() {
       // відкриваємо Telegram у новій вкладці / WebView
       window.open("https://t.me/+HER358IOgOM3YTY0", "_blank");
-
-      // показуємо кнопку карти
-      document.getElementById('mapBtn').style.display = 'block';
     }
   </script>
 </body>
