@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Мийки цистерн</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Roboto', sans-serif; text-align: center; padding: 40px 20px; background: #f8f9fa; margin: 0; min-height: 100vh; box-sizing: border-box; }
-    h1 { color: #222; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
-    p { font-size: 16px; color: #444; margin-bottom: 25px; }
-    h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-weight: 600; }
-    .btn { display: inline-block; margin: 10px; padding: 12px 24px; font-size: 18px; font-weight: 500; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: background 0.3s; }
-    .like { background: #28a745; color: white; }
-    .like:hover { background: #1e7e34; }
-    .dislike { background: #dc3545; color: white; }
-    .dislike:hover { background: #a71d2a; }
-    .counters { margin-top: 20px; font-size: 18px; color: #222; }
-    .version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
-    .btn-main { display: block; width: 80%; max-width: 300px; margin: 12px auto; padding: 16px 0; background: #0088cc; color: white; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: 500; transition: background 0.3s; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none; }
-    .btn-main:hover { background: #005f8d; }
-  </style>
+<meta charset="UTF-8">
+<title>Мийки цистерн</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Roboto', sans-serif; text-align: center; padding: 40px 20px; background: #f8f9fa; margin: 0; min-height: 100vh; box-sizing: border-box; }
+  h1 { color: #222; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
+  p { font-size: 16px; color: #444; margin-bottom: 25px; }
+  h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-weight: 600; }
+  .btn { display: inline-block; margin: 10px; padding: 12px 24px; font-size: 18px; font-weight: 500; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: background 0.3s; }
+  .like { background: #28a745; color: white; }
+  .like:hover { background: #1e7e34; }
+  .dislike { background: #dc3545; color: white; }
+  .dislike:hover { background: #a71d2a; }
+  .counters { margin-top: 20px; font-size: 18px; color: #222; }
+  .version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
+  .btn-main { display: block; width: 80%; max-width: 300px; margin: 12px auto; padding: 16px 0; background: #0088cc; color: white; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: 500; transition: background 0.3s; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none; }
+  .btn-main:hover { background: #005f8d; }
+  #voteMessage { margin-top: 15px; font-size: 16px; color: #222; min-height: 20px; }
+</style>
 </head>
 <body>
 
@@ -38,6 +39,8 @@
   Дизлайки: <span id="dislikeCount">0</span>
 </div>
 
+<div id="voteMessage"></div>
+
 <div class="version">Версія додатка: 1.0.0</div>
 
 <!-- Firebase SDK -->
@@ -46,29 +49,31 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // --- Встав сюди свої Firebase веб ключі ---
   const firebaseConfig = {
-    apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
-    authDomain: "miyjky.firebaseapp.com",
-    databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "miyjky",
-    storageBucket: "miyjky.firebasestorage.app",
-    messagingSenderId: "967414135211",
-    appId: "1:967414135211:web:9b3444523a807626dbfaee"
+  apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
+  authDomain: "miyjky.firebaseapp.com",
+  databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "miyjky",
+  storageBucket: "miyjky.firebasestorage.app",
+  messagingSenderId: "967414135211",
+  appId: "1:967414135211:web:9b3444523a807626dbfaee",
+  measurementId: "G-CEFQB8B7N5"
   };
   firebase.initializeApp(firebaseConfig);
 
   const db = firebase.database();
   const likeCountElem = document.getElementById('likeCount');
   const dislikeCountElem = document.getElementById('dislikeCount');
-
-  // --- Анонімна авторизація ---
-  firebase.auth().signInAnonymously().catch(console.error);
+  const voteMessage = document.getElementById('voteMessage');
 
   let currentUserUID = null;
+
+  firebase.auth().signInAnonymously().catch(console.error);
+
   firebase.auth().onAuthStateChanged(user => {
     if (user) {
       currentUserUID = user.uid;
+      checkUserVote();
       updateCounters();
     }
   });
@@ -81,16 +86,33 @@
     });
   }
 
+  function checkUserVote() {
+    const userVoteRef = db.ref('votes/users/' + currentUserUID);
+    userVoteRef.once('value').then(snapshot => {
+      if (snapshot.exists()) {
+        voteMessage.innerText = "Ви вже проголосували!";
+      } else {
+        voteMessage.innerText = "";
+      }
+    });
+  }
+
   function vote(type) {
-    if (!currentUserUID) return alert("Зачекайте, поки відбудеться авторизація...");
+    if (!currentUserUID) return voteMessage.innerText = "Зачекайте, поки відбудеться авторизація...";
 
     const userVoteRef = db.ref('votes/users/' + currentUserUID);
     userVoteRef.once('value').then(snapshot => {
       if (snapshot.exists()) {
-        alert("Ви вже проголосували!");
+        voteMessage.innerText = "Ви вже проголосували!";
         return;
       }
-      userVoteRef.set(type);
+
+      // запис голосу користувача
+      userVoteRef.set(type).then(() => {
+        voteMessage.innerText = "Дякуємо за голос!";
+      });
+
+      // оновлення загальних лічильників
       const voteRef = db.ref('votes');
       voteRef.transaction(currentData => {
         if (!currentData) currentData = {likes:0, dislikes:0, users:{}};
@@ -106,11 +128,13 @@
     setTimeout(() => window.open("https://t.me/+HER358IOgOM3YTY0", "_blank"), 500);
   }
 
-  // --- Реальний час ---
+  // Реальний час
   db.ref('votes').on('value', snapshot => {
-    const data = snapshot.val() || {likes:0, dislikes:0};
-    likeCountElem.innerText = data.likes || 0;
-    dislikeCountElem.innerText = data.dislikes || 0;
+    const data = snapshot.val();
+    if (data) {
+      likeCountElem.innerText = data.likes || 0;
+      dislikeCountElem.innerText = data.dislikes || 0;
+    }
   });
 </script>
 </body>
