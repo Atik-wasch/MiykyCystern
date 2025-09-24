@@ -30,11 +30,10 @@ textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-
 <h1>Ласкаво просимо на "Мийки цистерн"</h1>
 <p>Ви можете залишати інформацію про мийки цистерн у коментарях. Автори можуть додавати нові мийки, які з’являтимуться на карті.</p>
 
-<button class="btn-main" onclick="openTelegram()">📢 Підписатися на канал</button>
-<a class="btn-main" href="map.html">🗺 Перейти до карти</a>
-
 <h2>Авторизація через Google</h2>
 <button class="btn btn-main" onclick="signInWithGoogle()">Увійти через Google</button>
+
+<a id="mapLink" class="btn-main" href="map.html" style="display:none;">🗺 Перейти до карти</a>
 
 <h2>Ви задоволені?</h2>
 <button class="btn like" onclick="vote('like')" disabled>👍</button>
@@ -84,6 +83,7 @@ function signInWithGoogle() {
       currentUserUID = user.uid;
       alert("Авторизація успішна! Привіт, " + (user.displayName || "користувач"));
       enableVotingAndComments();
+      document.getElementById('mapLink').style.display = 'block';
     })
     .catch(error => {
       console.error(error);
@@ -166,6 +166,13 @@ function renderComments(comments) {
       div.className = 'comment';
       div.innerHTML = `<strong>${comment.name}:</strong> ${comment.text}`;
       
+      // Кнопки для редагування / видалення
+      if (comment.uid === currentUserUID) {
+        const editBtn = document.createElement('button');
+        editBtn.innerText = 'Редагувати';
+        editBtn.onclick = () => editComment(key, comment.text);
+        div.appendChild(editBtn);
+      }
       if (isAdmin) {
         const delBtn = document.createElement('button');
         delBtn.innerText = 'Видалити';
@@ -177,15 +184,17 @@ function renderComments(comments) {
     });
 }
 
+// --- Редагування коментаря ---
+function editComment(commentId, oldText) {
+  const newText = prompt("Редагувати коментар:", oldText);
+  if (newText === null) return; // Відміна
+  db.ref('comments/' + commentId + '/text').set(newText);
+}
+
+// --- Видалення коментаря ---
 function deleteComment(commentId) {
   if (!confirm("Ви впевнені, що хочете видалити цей коментар?")) return;
   db.ref('comments/' + commentId).remove();
-}
-
-// --- Telegram ---
-function openTelegram() {
-  window.location.href = "tg://resolve?domain=HER358IOgOM3YTY0";
-  setTimeout(() => window.open("https://t.me/+HER358IOgOM3YTY0", "_blank"), 500);
 }
 </script>
 </body>
