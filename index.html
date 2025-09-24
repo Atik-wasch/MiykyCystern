@@ -4,125 +4,83 @@
 <meta charset="UTF-8">
 <title>Мийки цистерн</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Roboto', sans-serif; text-align: center; padding: 40px 20px; background: #f8f9fa; margin: 0; min-height: 100vh; box-sizing: border-box; }
-h1 { color: #222; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
-p { font-size: 16px; color: #444; margin-bottom: 25px; }
-h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-weight: 600; }
-.btn { display: inline-block; margin: 10px; padding: 12px 24px; font-size: 18px; font-weight: 500; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: background 0.3s; }
-.like { background: #28a745; color: white; }
-.like:hover { background: #1e7e34; }
-.dislike { background: #dc3545; color: white; }
-.dislike:hover { background: #a71d2a; }
-.btn-main { display: block; width: 80%; max-width: 300px; margin: 12px auto; padding: 16px 0; background: #0088cc; color: white; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: 500; transition: background 0.3s; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none; }
-.btn-main:hover { background: #005f8d; }
-.counters { margin-top: 20px; font-size: 18px; color: #222; }
-.version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
-textarea, input { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 10px; }
-#commentsList { margin-top: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; }
-.comment { background: #fff; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.comment button { margin-left: 10px; padding: 2px 6px; font-size: 12px; cursor: pointer; }
+body{font-family:Roboto,sans-serif;text-align:center;padding:20px;background:#f8f9fa;margin:0;min-height:100vh;box-sizing:border-box;}
+h1{font-size:18px;margin:10px 0;}
+h2{font-size:16px;margin:10px 0;}
+p{font-size:14px;margin:10px 0;}
+.btn{margin:5px;padding:8px 16px;font-size:14px;border-radius:6px;border:none;cursor:pointer;}
+.like{background:#28a745;color:#fff;}
+.like:hover{background:#1e7e34;}
+.dislike{background:#dc3545;color:#fff;}
+.dislike:hover{background:#a71d2a;}
+.btn-main{display:block;width:80%;max-width:250px;margin:5px auto;padding:10px 0;background:#0088cc;color:#fff;border-radius:6px;font-size:14px;cursor:pointer;border:none;}
+.btn-main:hover{background:#005f8d;}
+.counters{margin-top:10px;font-size:14px;color:#222;}
+textarea,input{width:80%;max-width:300px;padding:6px;font-size:14px;border-radius:4px;border:1px solid #ccc;margin-bottom:5px;}
+#commentsList{margin-top:10px;text-align:left;max-width:400px;margin-left:auto;margin-right:auto;}
+.comment{background:#fff;padding:6px;margin-bottom:5px;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);}
+.comment button{margin-left:5px;padding:2px 4px;font-size:10px;cursor:pointer;}
+.version{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:10px;color:#888;background:rgba(255,255,255,0.7);padding:2px 4px;border-radius:3px;}
 </style>
 </head>
 <body>
 
-<h1>Ласкаво просимо на "Мийки цистерн"</h1>
-<p>Ви можете залишати інформацію про мийки цистерн у коментарях. Автори можуть додавати нові мийки, які з’являтимуться на карті.</p>
+<h1>Мийки цистерн</h1>
+<p>Залишайте інформацію про мийки. Автори додають мийки на карту.</p>
 
 <h2>Вхід користувача</h2>
 <input type="text" id="userNameInput" placeholder="Ваше ім'я">
 <button class="btn btn-main" onclick="signInAnon()">Увійти</button>
 
-<h2>Вхід для адміна</h2>
-<input type="password" id="adminKey" placeholder="Введіть ключ адміна">
+<h2>Вхід адміна</h2>
+<input type="password" id="adminKey" placeholder="Ключ адміна">
 <button class="btn btn-main" onclick="signInAdmin()">Увійти як адмін</button>
 
 <a id="mapLink" class="btn-main" href="map.html" style="display:none;">🗺 Перейти до карти</a>
 
-<h2>Ви задоволені?</h2>
+<h2>Лайки/Дизлайки</h2>
 <button class="btn like" onclick="vote('like')" disabled>👍</button>
 <button class="btn dislike" onclick="vote('dislike')" disabled>👎</button>
-
-<div class="counters">
-Лайки: <span id="likeCount">0</span> |
-Дизлайки: <span id="dislikeCount">0</span>
-</div>
+<div class="counters">Лайки: <span id="likeCount">0</span> | Дизлайки: <span id="dislikeCount">0</span></div>
 
 <h2>Коментарі</h2>
-<textarea id="commentInput" rows="3" placeholder="Ваш коментар..." disabled></textarea><br>
+<textarea id="commentInput" rows="2" placeholder="Ваш коментар..." disabled></textarea><br>
 <button class="btn btn-main" onclick="sendComment()" disabled>Відправити</button>
 <div id="commentsList"></div>
 
-<div class="version">Версія додатка: 1.0.0</div>
+<div class="version">Версія 1.0.0</div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
 <script>
-// --- Firebase конфіг ---
-const firebaseConfig = {
-  apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
-  authDomain: "miyjky.firebaseapp.com",
-  databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "miyjky",
-  storageBucket: "miyjky.firebasestorage.app",
-  messagingSenderId: "967414135211",
-  appId: "1:967414135211:web:9b3444523a807626dbfaee"
-};
+const firebaseConfig={apiKey:"AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",authDomain:"miyjky.firebaseapp.com",databaseURL:"https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",projectId:"miyjky",storageBucket:"miyjky.firebasestorage.app",messagingSenderId:"967414135211",appId:"1:967414135211:web:9b3444523a807626dbfaee"};
 firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let currentUserUID=null,currentUserName=null,latestComments={},isAdmin=false;
 
-const db = firebase.database();
-let currentUserUID = null;
-let currentUserName = null;
-let latestComments = {};
-let isAdmin = false;
+window.onload=function(){const n=localStorage.getItem('userName');if(n){document.getElementById('userNameInput').value=n;currentUserName=n;}}
 
-// --- Підставлення імені при завантаженні ---
-window.onload = function(){
-  const savedName = localStorage.getItem('userName');
-  if(savedName){
-    document.getElementById('userNameInput').value = savedName;
-    currentUserName = savedName;
-  }
-}
-
-// --- Анонімний вхід користувача ---
 function signInAnon(){
-  let nameInput = document.getElementById('userNameInput').value.trim();
-  if(!nameInput && localStorage.getItem('userName')){
-    nameInput = localStorage.getItem('userName');
-  }
-  if(!nameInput) return alert("Введіть своє ім'я!");
-
+  let name=document.getElementById('userNameInput').value.trim();
+  if(!name && localStorage.getItem('userName')) name=localStorage.getItem('userName');
+  if(!name) return alert("Введіть ім'я!");
   firebase.auth().signInAnonymously().then(res=>{
-    currentUserUID = res.user.uid;
-    currentUserName = nameInput;
-    localStorage.setItem('userName', currentUserName);
-    enableUI();
-    alert("Вхід успішний! Привіт, " + currentUserName);
-  }).catch(err=>alert("Помилка входу: "+err.message));
+    currentUserUID=res.user.uid;currentUserName=name;localStorage.setItem('userName',name);
+    enableUI();alert("Вхід успішний! Привіт, "+name);
+  }).catch(err=>alert("Помилка: "+err.message));
 }
 
-// --- Вхід адміна ---
 function signInAdmin(){
-  const key = document.getElementById('adminKey').value.trim();
-  if(key === "supersecret123"){
-    isAdmin = true;
+  const key=document.getElementById('adminKey').value.trim();
+  if(key==="admin123"){isAdmin=true;
     firebase.auth().signInAnonymously().then(res=>{
-      currentUserUID = res.user.uid;
-      currentUserName = "Адмін";
-      enableUI();
-      alert("Вхід адміна успішний!");
+      currentUserUID=res.user.uid;currentUserName="Адмін";enableUI();alert("Вхід адміна успішний!");
     });
-  } else {
-    alert("Невірний ключ адміна!");
-  }
+  }else alert("Невірний ключ!");
 }
 
-// --- Активуємо інтерфейс ---
 function enableUI(){
   document.querySelector('.like').disabled=false;
   document.querySelector('.dislike').disabled=false;
@@ -132,122 +90,46 @@ function enableUI(){
   updateCounters();
 }
 
-// --- Лайки / Дизлайки ---
 function updateCounters(){
-  db.ref('votes').once('value').then(snapshot=>{
-    const data = snapshot.val() || {likes:0, dislikes:0};
-    document.getElementById('likeCount').innerText = data.likes||0;
-    document.getElementById('dislikeCount').innerText = data.dislikes||0;
-  });
+  db.ref('votes').once('value').then(snap=>{const d=snap.val()||{likes:0,dislikes:0};document.getElementById('likeCount').innerText=d.likes||0;document.getElementById('dislikeCount').innerText=d.dislikes||0;});
 }
 
 function vote(type){
   if(!currentUserUID) return alert("Ви не авторизовані!");
-  const userVoteRef = db.ref('votes/users/'+currentUserUID);
-  userVoteRef.once('value').then(snapshot=>{
-    if(snapshot.exists()) return alert("Ви вже проголосували!");
-    userVoteRef.set(type);
-    const voteRef = db.ref('votes');
-    voteRef.transaction(currentData=>{
-      if(!currentData) currentData={likes:0, dislikes:0, users:{}};
-      if(type==='like') currentData.likes=(currentData.likes||0)+1;
-      if(type==='dislike') currentData.dislikes=(currentData.dislikes||0)+1;
-      return currentData;
-    });
+  const ref=db.ref('votes/users/'+currentUserUID);
+  ref.once('value').then(snap=>{if(snap.exists()) return alert("Ви вже голосували!");ref.set(type);
+    db.ref('votes').transaction(d=>{if(!d)d={likes:0,dislikes:0,users:{}};if(type==='like')d.likes=(d.likes||0)+1;if(type==='dislike')d.dislikes=(d.dislikes||0)+1;return d;});
   });
 }
 
-db.ref('votes').on('value', snapshot=>{
-  const data = snapshot.val()||{likes:0, dislikes:0};
-  document.getElementById('likeCount').innerText = data.likes||0;
-  document.getElementById('dislikeCount').innerText = data.dislikes||0;
-});
+db.ref('votes').on('value',snap=>{const d=snap.val()||{likes:0,dislikes:0};document.getElementById('likeCount').innerText=d.likes||0;document.getElementById('dislikeCount').innerText=d.dislikes||0;});
 
-// --- Коментарі ---
 function sendComment(){
-  const commentText = document.getElementById('commentInput').value.trim();
-  if(!commentText) return alert("Введіть коментар!");
-  if(!currentUserUID) return alert("Ви не авторизовані!");
-  
-  const newCommentRef = db.ref('comments').push();
-  newCommentRef.set({
-    uid: currentUserUID,
-    name: currentUserName,
-    text: commentText,
-    timestamp: Date.now()
-  });
-  
+  const t=document.getElementById('commentInput').value.trim();
+  if(!t) return alert("Введіть коментар!");if(!currentUserUID) return alert("Не авторизовані!");
+  db.ref('comments').push().set({uid:currentUserUID,name:currentUserName,text:t,timestamp:Date.now()});
   document.getElementById('commentInput').value='';
 }
 
-db.ref('comments').on('value', snapshot=>{
-  latestComments = snapshot.val()||{};
-  renderComments(latestComments);
-});
+db.ref('comments').on('value',snap=>{latestComments=snap.val()||{};renderComments(latestComments);});
 
-function renderComments(comments){
-  const commentsDiv = document.getElementById('commentsList');
-  commentsDiv.innerHTML='';
-  Object.entries(comments)
-    .sort((a,b)=>a[1].timestamp-b[1].timestamp)
-    .forEach(([key, comment])=>{
-      const div = document.createElement('div');
-      div.className='comment';
-      let text = `<strong>${comment.name}:</strong> ${comment.text}`;
-      if(comment.replies){
-        Object.entries(comment.replies)
-          .sort((a,b)=>a[1].timestamp-b[1].timestamp)
-          .forEach(([rKey, reply])=>{
-            text += `<br><em>${reply.adminName} відповідає:</em> ${reply.text}`;
-          });
-      }
-      div.innerHTML = text;
-
-      if(comment.uid===currentUserUID){
-        const editBtn=document.createElement('button');
-        editBtn.innerText='Редагувати';
-        editBtn.onclick=()=>editComment(key, comment.text);
-        div.appendChild(editBtn);
-      }
-      if(isAdmin){
-        const delBtn=document.createElement('button');
-        delBtn.innerText='Видалити';
-        delBtn.onclick=()=>deleteComment(key);
-        div.appendChild(delBtn);
-
-        const replyBtn=document.createElement('button');
-        replyBtn.innerText='Відповісти';
-        replyBtn.onclick=()=>replyComment(key, comment.name);
-        div.appendChild(replyBtn);
-      }
-      commentsDiv.appendChild(div);
-    });
-}
-
-// --- Редагування коментаря ---
-function editComment(commentId, oldText){
-  const newText = prompt("Редагувати коментар:", oldText);
-  if(newText===null) return;
-  db.ref('comments/'+commentId+'/text').set(newText);
-}
-
-// --- Видалення коментаря ---
-function deleteComment(commentId){
-  if(!confirm("Ви впевнені, що хочете видалити цей коментар?")) return;
-  db.ref('comments/'+commentId).remove();
-}
-
-// --- Відповідь адміна ---
-function replyComment(commentId, userName){
-  const replyText = prompt("Введіть відповідь для "+userName+":");
-  if(!replyText) return;
-  const replyRef = db.ref('comments/'+commentId+'/replies').push();
-  replyRef.set({
-    adminName: 'Адмін',
-    text: replyText,
-    timestamp: Date.now()
+function renderComments(c){
+  const div=document.getElementById('commentsList');div.innerHTML='';
+  Object.entries(c).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([k,cm])=>{
+    const d=document.createElement('div');d.className='comment';
+    let txt=`<strong>${cm.name}:</strong> ${cm.text}`;
+    if(cm.replies) Object.entries(cm.replies).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([rk,r])=>{txt+=`<br><em>${r.adminName} відповідає:</em> ${r.text}`;});
+    d.innerHTML=txt;
+    if(cm.uid===currentUserUID){const e=document.createElement('button');e.innerText='Редагувати';e.onclick=()=>editComment(k,cm.text);d.appendChild(e);}
+    if(isAdmin){const del=document.createElement('button');del.innerText='Видалити';del.onclick=()=>deleteComment(k);d.appendChild(del);
+      const rep=document.createElement('button');rep.innerText='Відповісти';rep.onclick=()=>replyComment(k,cm.name);d.appendChild(rep);}
+    div.appendChild(d);
   });
 }
+
+function editComment(id,old){const n=prompt("Редагувати:",old);if(n!==null) db.ref('comments/'+id+'/text').set(n);}
+function deleteComment(id){if(confirm("Видалити?")) db.ref('comments/'+id).remove();}
+function replyComment(id,name){const r=prompt("Відповідь для "+name+":");if(r) db.ref('comments/'+id+'/replies').push().set({adminName:'Адмін',text:r,timestamp:Date.now()});}
 </script>
 </body>
 </html>
