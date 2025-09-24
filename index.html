@@ -15,155 +15,123 @@
       min-height: 100vh;
       box-sizing: border-box;
     }
-    h1 {
-      color: #222;
-      font-size: 22px;
-      margin-bottom: 15px;
-      font-weight: 700;
-    }
-    p {
-      font-size: 16px;
-      color: #444;
-      margin-bottom: 25px;
-    }
-    h2 {
-      color: #222;
-      font-size: 20px;
-      margin-top: 40px;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-    .btn {
-      display: inline-block;
-      margin: 10px;
-      padding: 12px 24px;
-      font-size: 18px;
-      font-weight: 500;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: background 0.3s;
-    }
-    .like {
-      background: #28a745;
-      color: white;
-    }
-    .like:hover {
-      background: #1e7e34;
-    }
-    .dislike {
-      background: #dc3545;
-      color: white;
-    }
-    .dislike:hover {
-      background: #a71d2a;
-    }
-    .counters {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #222;
-    }
-    .version {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      color: #888;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 3px 6px;
-      border-radius: 4px;
-      z-index: 1000;
-    }
-    .btn-main {
-      display: block;
-      width: 80%;
-      max-width: 300px;
-      margin: 12px auto;
-      padding: 16px 0;
-      background: #0088cc;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-size: 18px;
-      font-weight: 500;
-      transition: background 0.3s;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      border: none;
-    }
-    .btn-main:hover {
-      background: #005f8d;
-    }
+    h1 { color: #222; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
+    p { font-size: 16px; color: #444; margin-bottom: 25px; }
+    h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-weight: 600; }
+    .btn { display: inline-block; margin: 10px; padding: 12px 24px; font-size: 18px; font-weight: 500; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: background 0.3s; }
+    .like { background: #28a745; color: white; }
+    .like:hover { background: #1e7e34; }
+    .dislike { background: #dc3545; color: white; }
+    .dislike:hover { background: #a71d2a; }
+    .counters { margin-top: 20px; font-size: 18px; color: #222; }
+    .version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
+    .btn-main { display: block; width: 80%; max-width: 300px; margin: 12px auto; padding: 16px 0; background: #0088cc; color: white; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: 500; transition: background 0.3s; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none; }
+    .btn-main:hover { background: #005f8d; }
   </style>
 </head>
 <body>
 
-  <h1>Ласкаво просимо на сайт "Мийки цистерн"</h1>
-  <p>Щоб користуватися сайтом, спершу підпишіться на наш Telegram-канал:</p>
+<h1>Ласкаво просимо на сайт "Мийки цистерн"</h1>
+<p>Щоб користуватися сайтом, спершу підпишіться на наш Telegram-канал:</p>
 
-  <button class="btn-main" onclick="openTelegram()">📢 Підписатися на канал</button>
-  <a class="btn-main" href="map.html">🗺 Перейти до карти</a>
+<button class="btn-main" onclick="openTelegram()">📢 Підписатися на канал</button>
+<a class="btn-main" href="map.html">🗺 Перейти до карти</a>
 
-  <h2>Ви задоволені моїм сайтом?</h2>
-  <button class="btn like" onclick="vote('like')">👍</button>
-  <button class="btn dislike" onclick="vote('dislike')">👎</button>
+<h2>Ви задоволені нашим сайтом?</h2>
+<button class="btn like" onclick="vote('like')">👍 Лайк</button>
+<button class="btn dislike" onclick="vote('dislike')">👎 Дизлайк</button>
 
-  <div class="counters">
-    Лайки: <span id="likeCount">0</span> |
-    Дизлайки: <span id="dislikeCount">0</span>
-  </div>
+<div class="counters">
+  Лайки: <span id="likeCount">0</span> |
+  Дизлайки: <span id="dislikeCount">0</span>
+</div>
 
-  <div class="version">Версія додатка: 1.0.0</div>
+<div class="version">Версія додатка: 1.0.0</div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-  <script>
-    // --- Налаштування Firebase ---
-    const firebaseConfig = {
-      apiKey: "ВАШ_API_KEY",
-      authDomain: "ВАШ_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://ВАШ_PROJECT_ID.firebaseio.com",
-      projectId: "ВАШ_PROJECT_ID",
-      storageBucket: "ВАШ_PROJECT_ID.appspot.com",
-      messagingSenderId: "ВАШ_SENDER_ID",
-      appId: "ВАШ_APP_ID"
-    };
+<script>
+  // --- Конфігурація Firebase ---
+  const firebaseConfig = {
+    apiKey: "ВАШ_API_KEY",
+    authDomain: "ВАШ_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://ВАШ_PROJECT_ID.firebaseio.com",
+    projectId: "ВАШ_PROJECT_ID",
+    storageBucket: "ВАШ_PROJECT_ID.appspot.com",
+    messagingSenderId: "ВАШ_SENDER_ID",
+    appId: "ВАШ_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  const db = firebase.database();
+  const likeCountElem = document.getElementById('likeCount');
+  const dislikeCountElem = document.getElementById('dislikeCount');
 
-    const likeCountElem = document.getElementById('likeCount');
-    const dislikeCountElem = document.getElementById('dislikeCount');
+  // --- Анонімна авторизація ---
+  firebase.auth().signInAnonymously().catch((error) => {
+    console.error("Auth error:", error);
+  });
 
-    // Отримуємо початкові значення з Firebase
-    db.ref('votes').on('value', (snapshot) => {
-      const data = snapshot.val() || {likes:0, dislikes:0};
-      likeCountElem.innerText = data.likes;
-      dislikeCountElem.innerText = data.dislikes;
+  let currentUserUID = null;
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      currentUserUID = user.uid;
+      updateCounters();
+    }
+  });
+
+  // --- Функція оновлення лічильників ---
+  function updateCounters() {
+    db.ref('votes').once('value').then((snapshot) => {
+      const data = snapshot.val() || {likes:0, dislikes:0, users:{}};
+      likeCountElem.innerText = data.likes || 0;
+      dislikeCountElem.innerText = data.dislikes || 0;
     });
+  }
 
-    function vote(type) {
-      const voteRef = db.ref('votes');
-      voteRef.transaction(currentData => {
-        if (currentData === null) {
-          currentData = {likes:0, dislikes:0};
-        }
-        if (type === 'like') currentData.likes++;
-        if (type === 'dislike') currentData.dislikes++;
-        return currentData;
-      });
-    }
+  // --- Голосування ---
+  function vote(type) {
+    if (!currentUserUID) return alert("Зачекайте, поки відбудеться авторизація...");
 
-    function openTelegram() {
-      window.location.href = "tg://resolve?domain=HER358IOgOM3YTY0";
-      setTimeout(function() {
-        window.open("https://t.me/+HER358IOgOM3YTY0", "_blank");
-      }, 500);
-    }
-  </script>
+    const userVoteRef = db.ref('votes/users/' + currentUserUID);
+    userVoteRef.once('value').then((snapshot) => {
+      if (snapshot.exists()) {
+        alert("Ви вже проголосували!");
+        return;
+      } else {
+        // Запис голосу користувача
+        userVoteRef.set(type);
+
+        // Оновлюємо загальні лічильники
+        const voteRef = db.ref('votes');
+        voteRef.transaction((currentData) => {
+          if (currentData === null) {
+            currentData = {likes:0, dislikes:0, users:{}};
+          }
+          if (type === 'like') currentData.likes = (currentData.likes || 0) + 1;
+          if (type === 'dislike') currentData.dislikes = (currentData.dislikes || 0) + 1;
+          return currentData;
+        });
+      }
+    });
+  }
+
+  function openTelegram() {
+    window.location.href = "tg://resolve?domain=HER358IOgOM3YTY0";
+    setTimeout(function() {
+      window.open("https://t.me/+HER358IOgOM3YTY0", "_blank");
+    }, 500);
+  }
+
+  // --- Слухаємо зміни в базі для реального часу ---
+  db.ref('votes').on('value', (snapshot) => {
+    const data = snapshot.val() || {likes:0, dislikes:0};
+    likeCountElem.innerText = data.likes || 0;
+    dislikeCountElem.innerText = data.dislikes || 0;
+  });
+</script>
 </body>
 </html>
