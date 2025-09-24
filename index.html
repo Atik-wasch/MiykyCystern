@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Мийки цистерн</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -35,6 +34,49 @@
       font-weight: 600;
     }
     .btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: 500;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+    }
+    .like {
+      background: #28a745;
+      color: white;
+    }
+    .like:hover {
+      background: #1e7e34;
+    }
+    .dislike {
+      background: #dc3545;
+      color: white;
+    }
+    .dislike:hover {
+      background: #a71d2a;
+    }
+    .counters {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #222;
+    }
+    .version {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #888;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 3px 6px;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+    .btn-main {
       display: block;
       width: 80%;
       max-width: 300px;
@@ -51,29 +93,8 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       border: none;
     }
-    .btn:hover {
+    .btn-main:hover {
       background: #005f8d;
-    }
-    /* версія додатка закріплена внизу */
-    .version {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      color: #888;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 3px 6px;
-      border-radius: 4px;
-      z-index: 1000;
-    }
-    /* iframe відгуків */
-    .feedback iframe {
-      width: 100%;
-      max-width: 600px;
-      height: 400px;
-      border: 0;
-      margin: 0 auto 30px;
     }
   </style>
 </head>
@@ -82,28 +103,83 @@
   <h1>Ласкаво просимо на сайт "Мийки цистерн"</h1>
   <p>Щоб користуватися сайтом, спершу підпишіться на наш Telegram-канал:</p>
 
-  <!-- кнопка Telegram -->
-  <button class="btn" onclick="openTelegram()">📢 Підписатися на канал</button>
+  <button class="btn-main" onclick="openTelegram()">📢 Підписатися на канал</button>
+  <a class="btn-main" href="map.html">🗺 Перейти до карти</a>
 
-  <!-- кнопка переходу на карту -->
-  <a class="btn" href="map.html">🗺 Перейти до карти</a>
+  <h2>Ви задоволені нашим сайтом?</h2>
+  <button class="btn like" onclick="vote('like')">👍 Лайк</button>
+  <button class="btn dislike" onclick="vote('dislike')">👎 Дизлайк</button>
 
-  <!-- блок відгуків -->
-  <h2>Залиште свій відгук</h2>
-  <p>Ваші коментарі допомагають нам ставати кращими!</p>
-  <div class="feedback">
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe6XhMTyRsFbWHqu95RhrpCnyb8x2ZyLUCHFtYsq3n4mwwPng/viewform?usp=dialog">Завантаження…</iframe>
+  <div class="counters">
+    Лайки: <span id="likeCount">0</span> |
+    Дизлайки: <span id="dislikeCount">0</span>
   </div>
 
-  <!-- версія додатка -->
   <div class="version">Версія додатка: 1.0.0</div>
 
-  <script>
-    function openTelegram() {
-      // спроба відкрити Telegram-додаток
-      window.location.href = "tg://resolve?domain=HER358IOgOM3YTY0";
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-      // запасний варіант на випадок, якщо додаток не відкриється
+  <script>
+    // --- Налаштування Firebase ---
+    const firebaseConfig = {
+  "project_info": {
+    "project_number": "967414135211",
+    "project_id": "miyjky",
+    "storage_bucket": "miyjky.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967414135211:android:fd09c99ee42fbac1dbfaee",
+        "android_client_info": {
+          "package_name": "com.company.atik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqAQFqyz5-xKtLrJPajSJarLJj5I61tg4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const likeCountElem = document.getElementById('likeCount');
+    const dislikeCountElem = document.getElementById('dislikeCount');
+
+    // Отримуємо початкові значення з Firebase
+    db.ref('votes').on('value', (snapshot) => {
+      const data = snapshot.val() || {likes:0, dislikes:0};
+      likeCountElem.innerText = data.likes;
+      dislikeCountElem.innerText = data.dislikes;
+    });
+
+    function vote(type) {
+      const voteRef = db.ref('votes');
+      voteRef.transaction(currentData => {
+        if (currentData === null) {
+          currentData = {likes:0, dislikes:0};
+        }
+        if (type === 'like') currentData.likes++;
+        if (type === 'dislike') currentData.dislikes++;
+        return currentData;
+      });
+    }
+
+    function openTelegram() {
+      window.location.href = "tg://resolve?domain=HER358IOgOM3YTY0";
       setTimeout(function() {
         window.open("https://t.me/+HER358IOgOM3YTY0", "_blank");
       }, 500);
@@ -111,5 +187,3 @@
   </script>
 </body>
 </html>
-
-
