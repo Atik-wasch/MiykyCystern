@@ -19,11 +19,10 @@ h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-w
 .btn-main:hover { background: #005f8d; }
 .counters { margin-top: 20px; font-size: 18px; color: #222; }
 .version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
-textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
+textarea, input { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 10px; }
 #commentsList { margin-top: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; }
 .comment { background: #fff; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .comment button { margin-left: 10px; padding: 2px 6px; font-size: 12px; cursor: pointer; }
-input { padding: 8px 12px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; width: 80%; max-width: 300px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -81,36 +80,41 @@ let currentUserName = null;
 let latestComments = {};
 let isAdmin = false;
 
+// --- Підставлення імені при завантаженні ---
+window.onload = function(){
+  const savedName = localStorage.getItem('userName');
+  if(savedName){
+    document.getElementById('userNameInput').value = savedName;
+    currentUserName = savedName;
+  }
+}
+
 // --- Анонімний вхід користувача ---
 function signInAnon(){
   let nameInput = document.getElementById('userNameInput').value.trim();
-  if(localStorage.getItem('userName')){
+  if(!nameInput && localStorage.getItem('userName')){
     nameInput = localStorage.getItem('userName');
   }
   if(!nameInput) return alert("Введіть своє ім'я!");
-  
-  firebase.auth().signInAnonymously()
-    .then(res=>{
-      currentUserUID = res.user.uid;
-      currentUserName = nameInput;
-      localStorage.setItem('userName', currentUserName);
-      enableVotingAndComments();
-      document.getElementById('mapLink').style.display='block';
-      alert("Вхід успішний! Привіт, " + currentUserName);
-    })
-    .catch(err=>alert("Помилка входу: "+err.message));
+
+  firebase.auth().signInAnonymously().then(res=>{
+    currentUserUID = res.user.uid;
+    currentUserName = nameInput;
+    localStorage.setItem('userName', currentUserName);
+    enableUI();
+    alert("Вхід успішний! Привіт, " + currentUserName);
+  }).catch(err=>alert("Помилка входу: "+err.message));
 }
 
 // --- Вхід адміна ---
 function signInAdmin(){
   const key = document.getElementById('adminKey').value.trim();
-  if(key === "supersecret123"){ // ключ адміна
+  if(key === "supersecret123"){
     isAdmin = true;
     firebase.auth().signInAnonymously().then(res=>{
       currentUserUID = res.user.uid;
       currentUserName = "Адмін";
-      enableVotingAndComments();
-      document.getElementById('mapLink').style.display='block';
+      enableUI();
       alert("Вхід адміна успішний!");
     });
   } else {
@@ -118,12 +122,13 @@ function signInAdmin(){
   }
 }
 
-// --- Активуємо лайки, дизлайки та коментарі ---
-function enableVotingAndComments(){
+// --- Активуємо інтерфейс ---
+function enableUI(){
   document.querySelector('.like').disabled=false;
   document.querySelector('.dislike').disabled=false;
   document.querySelector('#commentInput').disabled=false;
   document.querySelector('button[onclick="sendComment()"]').disabled=false;
+  document.getElementById('mapLink').style.display='block';
   updateCounters();
 }
 
@@ -188,13 +193,20 @@ function renderComments(comments){
     .forEach(([key, comment])=>{
       const div = document.createElement('div');
       div.className='comment';
-      div.innerHTML=`<strong>${comment.name}:</strong> ${comment.text}`;
-      
-      // Відповіді та редагування
+      let text = `<strong>${comment.name}:</strong> ${comment.text}`;
+      if(comment.replies){
+        Object.entries(comment.replies)
+          .sort((a,b)=>a[1].timestamp-b[1].timestamp)
+          .forEach(([rKey, reply])=>{
+            text += `<br><em>${reply.adminName} відповідає:</em> ${reply.text}`;
+          });
+      }
+      div.innerHTML = text;
+
       if(comment.uid===currentUserUID){
         const editBtn=document.createElement('button');
         editBtn.innerText='Редагувати';
-        editBtn.onclick=()=>editComment(key,comment.text);
+        editBtn.onclick=()=>editComment(key, comment.text);
         div.appendChild(editBtn);
       }
       if(isAdmin){
@@ -202,10 +214,10 @@ function renderComments(comments){
         delBtn.innerText='Видалити';
         delBtn.onclick=()=>deleteComment(key);
         div.appendChild(delBtn);
-        
+
         const replyBtn=document.createElement('button');
         replyBtn.innerText='Відповісти';
-        replyBtn.onclick=()=>replyComment(key,comment.name);
+        replyBtn.onclick=()=>replyComment(key, comment.name);
         div.appendChild(replyBtn);
       }
       commentsDiv.appendChild(div);
