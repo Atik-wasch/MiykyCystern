@@ -6,50 +6,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Roboto', sans-serif; text-align: center; padding: 40px 20px; background: #f8f9fa; margin: 0; min-height: 100vh; box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; text-align: center; padding: 40px 20px; background: #f8f9fa; margin: 0; min-height: 100vh; }
 h1 { color: #222; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
 p { font-size: 16px; color: #444; margin-bottom: 25px; }
 h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-weight: 600; }
-.btn { display: inline-block; margin: 10px; padding: 12px 24px; font-size: 18px; font-weight: 500; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: background 0.3s; }
-.like { background: #28a745; color: white; }
-.like:hover { background: #1e7e34; }
-.dislike { background: #dc3545; color: white; }
-.dislike:hover { background: #a71d2a; }
-.btn-main { display: block; width: 80%; max-width: 300px; margin: 12px auto; padding: 16px 0; background: #0088cc; color: white; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: 500; transition: background 0.3s; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none; }
-.btn-main:hover { background: #005f8d; }
-.counters { margin-top: 20px; font-size: 18px; color: #222; }
-.version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
-textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
-#commentsList { margin-top: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; }
-.comment { background: #fff; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.comment button { margin-left: 10px; padding: 2px 6px; font-size: 12px; cursor: pointer; }
+input, textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 10px; }
+.btn { display: inline-block; margin: 10px; padding: 12px 24px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background: #0088cc; color: white; }
+.btn:hover { background: #005f8d; }
+.comment { background: #fff; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; text-align: left; }
+.version { font-size: 12px; color: #888; margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<h1>Ласкаво просимо на "Мийки цистерн"</h1>
-<p>Ви можете залишати інформацію про мийки цистерн у коментарях. Автори можуть додавати нові мийки, які з’являтимуться на карті.</p>
+<h1>Мийки цистерн</h1>
 
-<h2>Авторизація через Google</h2>
-<button class="btn btn-main" onclick="signInWithGoogle()">Увійти через Google</button>
+<h2>Авторизація</h2>
+<input type="email" id="email" placeholder="Ваш email"><br>
+<input type="password" id="password" placeholder="Пароль"><br>
+<button class="btn" onclick="register()">Реєстрація</button>
+<button class="btn" onclick="login()">Увійти</button>
+<button class="btn" onclick="logout()">Вийти</button>
 
-<a id="mapLink" class="btn-main" href="map.html" style="display:none;">🗺 Перейти до карти</a>
+<a id="mapLink" class="btn" href="map.html" style="display:none;">🗺 Перейти до карти</a>
 
 <h2>Ви задоволені?</h2>
-<button class="btn like" onclick="vote('like')" disabled>👍</button>
-<button class="btn dislike" onclick="vote('dislike')" disabled>👎</button>
+<button class="btn" style="background:#28a745;" onclick="vote('like')" disabled>👍</button>
+<button class="btn" style="background:#dc3545;" onclick="vote('dislike')" disabled>👎</button>
 
 <div class="counters">
-Лайки: <span id="likeCount">0</span> |
-Дизлайки: <span id="dislikeCount">0</span>
+Лайки: <span id="likeCount">0</span> | Дизлайки: <span id="dislikeCount">0</span>
 </div>
 
 <h2>Коментарі</h2>
 <textarea id="commentInput" rows="3" placeholder="Ваш коментар..." disabled></textarea><br>
-<button class="btn btn-main" onclick="sendComment()" disabled>Відправити</button>
+<button class="btn" onclick="sendComment()" disabled>Відправити</button>
 <div id="commentsList"></div>
 
-<div class="version">Версія додатка: 1.0.0</div>
+<div class="version">Версія: 1.1.0</div>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -57,13 +51,13 @@ textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-// --- Firebase конфіг ---
+// --- Firebase ---
 const firebaseConfig = {
   apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
   authDomain: "miyjky.firebaseapp.com",
   databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "miyjky",
-  storageBucket: "miyjky.firebasestorage.app",
+  storageBucket: "miyjky.appspot.com",
   messagingSenderId: "967414135211",
   appId: "1:967414135211:web:9b3444523a807626dbfaee"
 };
@@ -71,36 +65,60 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 let currentUserUID = null;
-let latestComments = {};
-let isAdmin = false;
 
-// --- Google Auth ---
-function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider)
-    .then(result => {
-      const user = result.user;
-      currentUserUID = user.uid;
-      alert("Авторизація успішна! Привіт, " + (user.displayName || "користувач"));
-      enableVotingAndComments();
-      document.getElementById('mapLink').style.display = 'block';
+// --- Реєстрація ---
+function register() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      alert("Реєстрація успішна!");
     })
-    .catch(error => {
-      console.error(error);
-      alert("Помилка авторизації: " + error.message);
-    });
+    .catch(error => alert(error.message));
 }
 
-// --- Активуємо лайки, дизлайки та коментарі ---
-function enableVotingAndComments() {
-  document.querySelector('.like').disabled = false;
-  document.querySelector('.dislike').disabled = false;
-  document.querySelector('#commentInput').disabled = false;
+// --- Вхід ---
+function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      const user = userCredential.user;
+      currentUserUID = user.uid;
+      alert("Вхід успішний: " + email);
+      enableFeatures();
+    })
+    .catch(error => alert(error.message));
+}
+
+// --- Вихід ---
+function logout() {
+  firebase.auth().signOut().then(() => {
+    alert("Ви вийшли з акаунта");
+    currentUserUID = null;
+    disableFeatures();
+  });
+}
+
+// --- Активуємо функції після входу ---
+function enableFeatures() {
+  document.querySelector('button[onclick="vote(\'like\')"]').disabled = false;
+  document.querySelector('button[onclick="vote(\'dislike\')"]').disabled = false;
+  document.getElementById('commentInput').disabled = false;
   document.querySelector('button[onclick="sendComment()"]').disabled = false;
+  document.getElementById('mapLink').style.display = 'inline-block';
   updateCounters();
 }
 
-// --- Лайки / Дизлайки ---
+function disableFeatures() {
+  document.querySelector('button[onclick="vote(\'like\')"]').disabled = true;
+  document.querySelector('button[onclick="vote(\'dislike\')"]').disabled = true;
+  document.getElementById('commentInput').disabled = true;
+  document.querySelector('button[onclick="sendComment()"]').disabled = true;
+  document.getElementById('mapLink').style.display = 'none';
+}
+
+// --- Лайки ---
 function updateCounters() {
   db.ref('votes').once('value').then(snapshot => {
     const data = snapshot.val() || {likes:0, dislikes:0};
@@ -110,16 +128,16 @@ function updateCounters() {
 }
 
 function vote(type) {
-  if (!currentUserUID) return alert("Ви не авторизовані!");
+  if (!currentUserUID) return alert("Увійдіть спочатку!");
   const userVoteRef = db.ref('votes/users/' + currentUserUID);
   userVoteRef.once('value').then(snapshot => {
-    if (snapshot.exists()) return alert("Ви вже проголосували!");
+    if (snapshot.exists()) return alert("Ви вже голосували!");
     userVoteRef.set(type);
     const voteRef = db.ref('votes');
     voteRef.transaction(currentData => {
       if (!currentData) currentData = {likes:0, dislikes:0, users:{}};
-      if (type === 'like') currentData.likes = (currentData.likes || 0) + 1;
-      if (type === 'dislike') currentData.dislikes = (currentData.dislikes || 0) + 1;
+      if (type === 'like') currentData.likes++;
+      if (type === 'dislike') currentData.dislikes++;
       return currentData;
     });
   });
@@ -133,69 +151,32 @@ db.ref('votes').on('value', snapshot => {
 
 // --- Коментарі ---
 function sendComment() {
-  const commentText = document.getElementById('commentInput').value.trim();
-  if (!commentText) return alert("Введіть коментар!");
-  if (!currentUserUID) return alert("Ви не авторизовані!");
-  
+  const text = document.getElementById('commentInput').value.trim();
+  if (!text) return alert("Введіть коментар!");
+  if (!currentUserUID) return alert("Спочатку увійдіть!");
   const user = firebase.auth().currentUser;
-  const userName = user.displayName || "Користувач";
-  
-  const newCommentRef = db.ref('comments').push();
-  newCommentRef.set({
+  const userName = user.email.split('@')[0]; // ім'я з email
+  db.ref('comments').push({
     uid: currentUserUID,
     name: userName,
-    text: commentText,
+    text: text,
     timestamp: Date.now()
   });
-  
   document.getElementById('commentInput').value = '';
 }
 
 db.ref('comments').on('value', snapshot => {
-  latestComments = snapshot.val() || {};
-  renderComments(latestComments);
-});
-
-function renderComments(comments) {
-  const commentsDiv = document.getElementById('commentsList');
-  commentsDiv.innerHTML = '';
-  Object.entries(comments)
-    .sort((a,b) => a[1].timestamp - b[1].timestamp)
-    .forEach(([key, comment]) => {
-      const div = document.createElement('div');
-      div.className = 'comment';
-      div.innerHTML = `<strong>${comment.name}:</strong> ${comment.text}`;
-      
-      // Кнопки для редагування / видалення
-      if (comment.uid === currentUserUID) {
-        const editBtn = document.createElement('button');
-        editBtn.innerText = 'Редагувати';
-        editBtn.onclick = () => editComment(key, comment.text);
-        div.appendChild(editBtn);
-      }
-      if (isAdmin) {
-        const delBtn = document.createElement('button');
-        delBtn.innerText = 'Видалити';
-        delBtn.onclick = () => deleteComment(key);
-        div.appendChild(delBtn);
-      }
-      
-      commentsDiv.appendChild(div);
+  const comments = snapshot.val() || {};
+  const div = document.getElementById('commentsList');
+  div.innerHTML = '';
+  Object.entries(comments).sort((a,b) => a[1].timestamp - b[1].timestamp)
+    .forEach(([id, c]) => {
+      const el = document.createElement('div');
+      el.className = 'comment';
+      el.innerHTML = `<strong>${c.name}:</strong> ${c.text}`;
+      div.appendChild(el);
     });
-}
-
-// --- Редагування коментаря ---
-function editComment(commentId, oldText) {
-  const newText = prompt("Редагувати коментар:", oldText);
-  if (newText === null) return; // Відміна
-  db.ref('comments/' + commentId + '/text').set(newText);
-}
-
-// --- Видалення коментаря ---
-function deleteComment(commentId) {
-  if (!confirm("Ви впевнені, що хочете видалити цей коментар?")) return;
-  db.ref('comments/' + commentId).remove();
-}
+});
 </script>
 </body>
 </html>
