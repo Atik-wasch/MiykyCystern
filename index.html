@@ -54,35 +54,15 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // --- Конфігурація Firebase ---
+  // --- Встав свій веб Firebase-конфіг ---
   const firebaseConfig = {
-     "project_info": {
-    "project_number": "967414135211",
-    "project_id": "miyjky",
-    "storage_bucket": "miyjky.firebasestorage.app"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:967414135211:android:fd09c99ee42fbac1dbfaee",
-        "android_client_info": {
-          "package_name": "com.company.atik"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCqAQFqyz5-xKtLrJPajSJarLJj5I61tg4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
+    apiKey: "AIzaSyCqAQFqyz5-xKtLrJPajSJarLJj5I61tg4",
+    authDomain: "miyjky",
+    databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app/voites",
+    projectId: "miyjky",
+    storageBucket: "ВАШ_PROJECT_ID.appspot.com",
+    messagingSenderId: "ВАШ_SENDER_ID",
+    appId: "1:967414135211:android:fd09c99ee42fbac1dbfaee"
   };
   firebase.initializeApp(firebaseConfig);
 
@@ -103,7 +83,6 @@
     }
   });
 
-  // --- Функція оновлення лічильників ---
   function updateCounters() {
     db.ref('votes').once('value').then((snapshot) => {
       const data = snapshot.val() || {likes:0, dislikes:0, users:{}};
@@ -112,7 +91,6 @@
     });
   }
 
-  // --- Голосування ---
   function vote(type) {
     if (!currentUserUID) return alert("Зачекайте, поки відбудеться авторизація...");
 
@@ -122,7 +100,7 @@
         alert("Ви вже проголосували!");
         return;
       } else {
-        // Запис голосу користувача
+        // Записуємо голос користувача
         userVoteRef.set(type);
 
         // Оновлюємо загальні лічильники
@@ -141,12 +119,10 @@
 
   function openTelegram() {
     window.location.href = "tg://resolve?domain=HER358IOgOM3YTY0";
-    setTimeout(function() {
-      window.open("https://t.me/+HER358IOgOM3YTY0", "_blank");
-    }, 500);
+    setTimeout(() => window.open("https://t.me/+HER358IOgOM3YTY0", "_blank"), 500);
   }
 
-  // --- Слухаємо зміни в базі для реального часу ---
+  // --- Реальний час ---
   db.ref('votes').on('value', (snapshot) => {
     const data = snapshot.val() || {likes:0, dislikes:0};
     likeCountElem.innerText = data.likes || 0;
@@ -155,4 +131,3 @@
 </script>
 </body>
 </html>
-
