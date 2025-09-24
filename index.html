@@ -2,9 +2,8 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Мийки цистерн</title>
+  <title>Мийки цистерн – Відгуки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -16,38 +15,40 @@
       min-height: 100vh;
       box-sizing: border-box;
     }
-    h1 {
+    h1, h2 {
       color: #222;
-      font-size: 22px;
       margin-bottom: 15px;
-      font-weight: 700;
     }
     p {
       font-size: 16px;
       color: #444;
       margin-bottom: 25px;
     }
-    .btn {
-      display: block;
+    input, textarea {
       width: 80%;
-      max-width: 300px;
-      margin: 12px auto;
-      padding: 16px 0;
-      background: #0088cc;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-size: 18px;
-      font-weight: 500;
-      transition: background 0.3s;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      max-width: 400px;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      display: block;
+      margin: 15px auto;
+      padding: 12px 20px;
+      font-size: 16px;
       border: none;
+      border-radius: 8px;
+      background-color: #0088cc;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
     }
-    .btn:hover {
-      background: #005f8d;
+    button:hover {
+      background-color: #005f8d;
     }
-    /* версія додатка закріплена внизу */
     .version {
       position: fixed;
       bottom: 10px;
@@ -60,31 +61,87 @@
       border-radius: 4px;
       z-index: 1000;
     }
+    .feedback-list {
+      margin-top: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+    .feedback-item {
+      background: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .feedback-item strong {
+      color: #0088cc;
+    }
   </style>
 </head>
 <body>
-  <h1>Ласкаво просимо на сайт "Мийки цистерн"</h1>
-  <p>Щоб користуватися сайтом, спершу підпишіться на наш Telegram-канал:</p>
 
-  <!-- кнопка Telegram -->
-  <button class="btn" onclick="openTelegram()">📢 Підписатися на канал</button>
+  <h1>Відгуки про "Мийки цистерн"</h1>
+  <p>Залиште свій відгук, щоб допомогти нам ставати кращими!</p>
 
-  <!-- кнопка переходу на карту -->
-  <a class="btn" href="map.html">🗺 Перейти до карти</a>
+  <input type="text" id="name" placeholder="Ваше ім'я">
+  <textarea id="message" rows="4" placeholder="Ваш відгук"></textarea>
+  <button onclick="submitFeedback()">Відправити</button>
 
-  <!-- версія додатка -->
+  <div class="feedback-list" id="feedbackList">
+    <h2>Всі відгуки:</h2>
+  </div>
+
   <div class="version">Версія додатка: 1.0.0</div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
-    function openTelegram() {
-      // спроба відкрити Telegram-додаток
-      window.location.href = "tg://resolve?domain=HER358IOgOM3YTY0";
+    // ====== Налаштування Firebase ======
+    const firebaseConfig = {
+      apiKey: "ВАШ_API_KEY",
+      authDomain: "ВАШ_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://ВАШ_PROJECT_ID.firebaseio.com",
+      projectId: "ВАШ_PROJECT_ID",
+      storageBucket: "ВАШ_PROJECT_ID.appspot.com",
+      messagingSenderId: "ВАШ_SENDER_ID",
+      appId: "ВАШ_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-      // запасний варіант на випадок, якщо додаток не відкриється
-      setTimeout(function() {
-        window.open("https://t.me/+HER358IOgOM3YTY0", "_blank");
-      }, 500);
+    // ====== Відправка відгуку ======
+    function submitFeedback() {
+      const name = document.getElementById('name').value.trim();
+      const message = document.getElementById('message').value.trim();
+      if(name === '' || message === '') {
+        alert('Будь ласка, заповніть обидва поля.');
+        return;
+      }
+      const feedbackRef = database.ref('feedbacks');
+      const newFeedback = {
+        name: name,
+        message: message,
+        timestamp: Date.now()
+      };
+      feedbackRef.push(newFeedback);
+      document.getElementById('name').value = '';
+      document.getElementById('message').value = '';
     }
+
+    // ====== Вивід всіх відгуків ======
+    const feedbackList = document.getElementById('feedbackList');
+    const feedbackRef = database.ref('feedbacks');
+    feedbackRef.on('child_added', (data) => {
+      const fb = data.val();
+      const div = document.createElement('div');
+      div.className = 'feedback-item';
+      div.innerHTML = `<strong>${fb.name}</strong>: ${fb.message}`;
+      feedbackList.appendChild(div);
+    });
   </script>
+
 </body>
 </html>
