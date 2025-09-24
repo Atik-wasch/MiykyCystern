@@ -13,6 +13,8 @@
       padding: 40px 20px;
       background: #f8f9fa;
       margin: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
     }
     h1 {
       color: #222;
@@ -45,6 +47,19 @@
     .btn:hover {
       background: #005f8d;
     }
+    /* версія додатка закріплена внизу */
+    .version {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #888;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 3px 6px;
+      border-radius: 4px;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -56,6 +71,9 @@
 
   <!-- кнопка переходу на карту -->
   <a class="btn" href="map.html">🗺 Перейти до карти</a>
+
+  <!-- версія додатка -->
+  <div class="version">Версія додатка: 1.0.0</div>
 
   <script>
     function openTelegram() {
