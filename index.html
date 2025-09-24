@@ -33,16 +33,8 @@ textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-
 <button class="btn-main" onclick="openTelegram()">📢 Підписатися на канал</button>
 <a class="btn-main" href="map.html">🗺 Перейти до карти</a>
 
-<h2>Авторизація через телефон</h2>
-<input type="text" id="phoneNumber" placeholder="+380XXXXXXXXX">
-<button class="btn btn-main" onclick="sendOTP()">Отримати код</button><br><br>
-
-<div id="otpSection" style="display:none;">
-  <input type="text" id="otpCode" placeholder="Введіть код">
-  <button class="btn btn-main" onclick="verifyOTP()">Підтвердити</button>
-</div>
-
-<div id="recaptcha-container"></div>
+<h2>Авторизація через Google</h2>
+<button class="btn btn-main" onclick="signInWithGoogle()">Увійти через Google</button>
 
 <h2>Ви задоволені?</h2>
 <button class="btn like" onclick="vote('like')" disabled>👍</button>
@@ -54,7 +46,7 @@ textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-
 </div>
 
 <h2>Коментарі</h2>
-<textarea id="commentInput" rows="3" placeholder="Ваш коментар..."></textarea><br>
+<textarea id="commentInput" rows="3" placeholder="Ваш коментар..." disabled></textarea><br>
 <button class="btn btn-main" onclick="sendComment()" disabled>Відправити</button>
 <div id="commentsList"></div>
 
@@ -80,46 +72,22 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 let currentUserUID = null;
-let confirmationResult = null;
 let latestComments = {};
 let isAdmin = false;
 
-// --- Recaptcha ---
-window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-  'size': 'invisible'
-});
-
-// --- Надсилання OTP ---
-function sendOTP() {
-  const phoneNumber = document.getElementById('phoneNumber').value;
-  if (!phoneNumber) return alert("Введіть номер телефону!");
-  const appVerifier = window.recaptchaVerifier;
-  firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-    .then(result => {
-      confirmationResult = result;
-      alert("Код надіслано на номер!");
-      document.getElementById('otpSection').style.display = 'block';
-    })
-    .catch(error => {
-      console.error(error);
-      alert("Помилка надсилання коду: " + error.message);
-    });
-}
-
-// --- Підтвердження OTP ---
-function verifyOTP() {
-  const code = document.getElementById('otpCode').value;
-  if (!confirmationResult) return alert("Спершу надішліть код!");
-  confirmationResult.confirm(code)
+// --- Google Auth ---
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
     .then(result => {
       const user = result.user;
       currentUserUID = user.uid;
-      alert("Авторизація успішна!");
+      alert("Авторизація успішна! Привіт, " + (user.displayName || "користувач"));
       enableVotingAndComments();
     })
     .catch(error => {
       console.error(error);
-      alert("Невірний код!");
+      alert("Помилка авторизації: " + error.message);
     });
 }
 
@@ -168,8 +136,18 @@ function sendComment() {
   const commentText = document.getElementById('commentInput').value.trim();
   if (!commentText) return alert("Введіть коментар!");
   if (!currentUserUID) return alert("Ви не авторизовані!");
+  
+  const user = firebase.auth().currentUser;
+  const userName = user.displayName || "Користувач";
+  
   const newCommentRef = db.ref('comments').push();
-  newCommentRef.set({uid: currentUserUID, text: commentText, timestamp: Date.now()});
+  newCommentRef.set({
+    uid: currentUserUID,
+    name: userName,
+    text: commentText,
+    timestamp: Date.now()
+  });
+  
   document.getElementById('commentInput').value = '';
 }
 
@@ -181,18 +159,22 @@ db.ref('comments').on('value', snapshot => {
 function renderComments(comments) {
   const commentsDiv = document.getElementById('commentsList');
   commentsDiv.innerHTML = '';
-  Object.entries(comments).sort((a,b) => a[1].timestamp - b[1].timestamp).forEach(([key, comment]) => {
-    const div = document.createElement('div');
-    div.className = 'comment';
-    div.innerText = comment.text;
-    if (isAdmin) {
-      const delBtn = document.createElement('button');
-      delBtn.innerText = 'Видалити';
-      delBtn.onclick = () => deleteComment(key);
-      div.appendChild(delBtn);
-    }
-    commentsDiv.appendChild(div);
-  });
+  Object.entries(comments)
+    .sort((a,b) => a[1].timestamp - b[1].timestamp)
+    .forEach(([key, comment]) => {
+      const div = document.createElement('div');
+      div.className = 'comment';
+      div.innerHTML = `<strong>${comment.name}:</strong> ${comment.text}`;
+      
+      if (isAdmin) {
+        const delBtn = document.createElement('button');
+        delBtn.innerText = 'Видалити';
+        delBtn.onclick = () => deleteComment(key);
+        div.appendChild(delBtn);
+      }
+      
+      commentsDiv.appendChild(div);
+    });
 }
 
 function deleteComment(commentId) {
