@@ -15,10 +15,14 @@ h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-w
 .like:hover { background: #1e7e34; }
 .dislike { background: #dc3545; color: white; }
 .dislike:hover { background: #a71d2a; }
-.counters { margin-top: 20px; font-size: 18px; color: #222; }
-.version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
 .btn-main { display: block; width: 80%; max-width: 300px; margin: 12px auto; padding: 16px 0; background: #0088cc; color: white; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: 500; transition: background 0.3s; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none; }
 .btn-main:hover { background: #005f8d; }
+.counters { margin-top: 20px; font-size: 18px; color: #222; }
+.version { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #888; background: rgba(255,255,255,0.7); padding: 3px 6px; border-radius: 4px; z-index: 1000; }
+textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
+#commentsList { margin-top: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; }
+.comment { background: #fff; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.comment button { margin-left: 10px; padding: 2px 6px; font-size: 12px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -29,14 +33,20 @@ h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-w
 <button class="btn-main" onclick="openTelegram()">📢 Підписатися на канал</button>
 <a class="btn-main" href="map.html">🗺 Перейти до карти</a>
 
-<h2>Ви задоволені моїм сайтом?</h2>
-<button class="btn like" onclick="vote('like')" disabled>👍</button>
-<button class="btn dislike" onclick="vote('dislike')" disabled>👎</button>
+<h2>Ви задоволені нашим сайтом?</h2>
+<button class="btn like" onclick="vote('like')" disabled>👍 Лайк</button>
+<button class="btn dislike" onclick="vote('dislike')" disabled>👎 Дизлайк</button>
 
 <div class="counters">
 Лайки: <span id="likeCount">0</span> |
 Дизлайки: <span id="dislikeCount">0</span>
 </div>
+
+<h2>Коментарі</h2>
+<textarea id="commentInput" rows="3" placeholder="Ваш коментар..."></textarea><br>
+<button class="btn btn-main" onclick="sendComment()">Відправити</button>
+<div id="commentsList"></div>
+<button class="btn" onclick="setAdmin()">Увійти як адміністратор</button>
 
 <div class="version">Версія додатка: 1.0.0</div>
 
@@ -46,16 +56,15 @@ h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-w
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-// --- Встав сюди свої Firebase ключі ---
+// --- Firebase конфіг ---
 const firebaseConfig = {
-  apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
-  authDomain: "miyjky.firebaseapp.com",
-  databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "miyjky",
-  storageBucket: "miyjky.firebasestorage.app",
-  messagingSenderId: "967414135211",
-  appId: "1:967414135211:web:9b3444523a807626dbfaee",
-  measurementId: "G-CEFQB8B7N5"
+  apiKey: "ВАШ_API_KEY",
+  authDomain: "ВАШ_PROJECT_ID.firebaseapp.com",
+  databaseURL: "ВАШ_DATABASE_URL",
+  projectId: "ВАШ_PROJECT_ID",
+  storageBucket: "ВАШ_PROJECT_ID.appspot.com",
+  messagingSenderId: "ВАШ_SENDER_ID",
+  appId: "ВАШ_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -64,15 +73,15 @@ const likeCountElem = document.getElementById('likeCount');
 const dislikeCountElem = document.getElementById('dislikeCount');
 const btnLike = document.querySelector('.like');
 const btnDislike = document.querySelector('.dislike');
-
 let currentUserUID = null;
+let latestComments = {};
+let isAdmin = false;
 
 // --- Анонімна авторизація ---
 firebase.auth().signInAnonymously()
   .then(() => console.log("Анонімна авторизація успішна"))
   .catch((error) => console.error("Помилка авторизації:", error));
 
-// --- Включаємо кнопки після авторизації ---
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
     currentUserUID = user.uid;
@@ -82,7 +91,7 @@ firebase.auth().onAuthStateChanged(user => {
   }
 });
 
-// --- Оновлення лічильників ---
+// --- Лайки / Дизлайки ---
 function updateCounters() {
   db.ref('votes').once('value').then(snapshot => {
     const data = snapshot.val() || {likes:0, dislikes:0};
@@ -91,18 +100,12 @@ function updateCounters() {
   });
 }
 
-// --- Голосування ---
 function vote(type) {
-  if (!currentUserUID) return alert("Зачекайте, поки відбудеться авторизація...");
-
+  if (!currentUserUID) return alert("Зачекайте, поки авторизація завершиться...");
   const userVoteRef = db.ref('votes/users/' + currentUserUID);
   userVoteRef.once('value').then(snapshot => {
-    if (snapshot.exists()) {
-      alert("Ви вже проголосували!");
-      return;
-    }
+    if (snapshot.exists()) return alert("Ви вже проголосували!");
     userVoteRef.set(type);
-
     const voteRef = db.ref('votes');
     voteRef.transaction(currentData => {
       if (!currentData) currentData = {likes:0, dislikes:0, users:{}};
@@ -113,12 +116,58 @@ function vote(type) {
   });
 }
 
-// --- Реальний час ---
 db.ref('votes').on('value', snapshot => {
   const data = snapshot.val() || {likes:0, dislikes:0};
   likeCountElem.innerText = data.likes || 0;
   dislikeCountElem.innerText = data.dislikes || 0;
 });
+
+// --- Коментарі ---
+function sendComment() {
+  const commentText = document.getElementById('commentInput').value.trim();
+  if (!commentText) return alert("Введіть коментар!");
+  if (!currentUserUID) return alert("Зачекайте, поки авторизація завершиться...");
+  const newCommentRef = db.ref('comments').push();
+  newCommentRef.set({uid: currentUserUID, text: commentText, timestamp: Date.now()});
+  document.getElementById('commentInput').value = '';
+}
+
+db.ref('comments').on('value', snapshot => {
+  latestComments = snapshot.val() || {};
+  renderComments(latestComments);
+});
+
+function renderComments(comments) {
+  const commentsDiv = document.getElementById('commentsList');
+  commentsDiv.innerHTML = '';
+  Object.entries(comments).sort((a,b) => a[1].timestamp - b[1].timestamp).forEach(([key, comment]) => {
+    const div = document.createElement('div');
+    div.className = 'comment';
+    div.innerText = comment.text;
+    if (isAdmin) {
+      const delBtn = document.createElement('button');
+      delBtn.innerText = 'Видалити';
+      delBtn.onclick = () => deleteComment(key);
+      div.appendChild(delBtn);
+    }
+    commentsDiv.appendChild(div);
+  });
+}
+
+function deleteComment(commentId) {
+  if (!confirm("Ви впевнені, що хочете видалити цей коментар?")) return;
+  db.ref('comments/' + commentId).remove();
+}
+
+// --- Адмін ---
+function setAdmin() {
+  const code = prompt("Введіть код адміністратора:");
+  if (code === "ADMIN123") {
+    isAdmin = true;
+    alert("Ви увійшли як адміністратор");
+    renderComments(latestComments);
+  } else alert("Невірний код");
+}
 
 // --- Telegram ---
 function openTelegram() {
@@ -128,4 +177,3 @@ function openTelegram() {
 </script>
 </body>
 </html>
-
