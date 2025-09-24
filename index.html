@@ -106,13 +106,13 @@
   <button class="btn-main" onclick="openTelegram()">📢 Підписатися на канал</button>
   <a class="btn-main" href="map.html">🗺 Перейти до карти</a>
 
-  <h2>Ви задоволені нашим сайтом?</h2>
+  <h2>Ви задоволені моїм сайтом?</h2>
   <button class="btn like" onclick="vote('like')">👍 Лайк</button>
   <button class="btn dislike" onclick="vote('dislike')">👎 Дизлайк</button>
 
   <div class="counters">
-    Лайки: <span id="likeCount">0</span> |
-    Дизлайки: <span id="dislikeCount">0</span>
+    : <span id="likeCount">0</span> |
+    : <span id="dislikeCount">0</span>
   </div>
 
   <div class="version">Версія додатка: 1.0.0</div>
@@ -151,7 +151,7 @@
     }
   ],
   "configuration_version": "1"
-}
+};
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -187,3 +187,4 @@
   </script>
 </body>
 </html>
+
