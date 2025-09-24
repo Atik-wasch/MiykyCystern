@@ -6,15 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      text-align: center;
-      padding: 40px 20px;
-      background: #f8f9fa;
-      margin: 0;
-      min-height: 100vh;
-      box-sizing: border-box;
-    }
+    body { font-family: 'Roboto', sans-serif; text-align: center; padding: 40px 20px; background: #f8f9fa; margin: 0; min-height: 100vh; box-sizing: border-box; }
     h1 { color: #222; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
     p { font-size: 16px; color: #444; margin-bottom: 25px; }
     h2 { color: #222; font-size: 20px; margin-top: 40px; margin-bottom: 10px; font-weight: 600; }
@@ -48,41 +40,21 @@
 
 <div class="version">Версія додатка: 1.0.0</div>
 
-<!-- Firebase -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // --- Встав свій веб Firebase-конфіг ---
+  // --- Встав сюди свої Firebase веб ключі ---
   const firebaseConfig = {
-  "project_info": {
-    "project_number": "256190276501",
-    "project_id": "mywebapp-12f3d",
-    "storage_bucket": "mywebapp-12f3d.firebasestorage.app"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:256190276501:android:88ce542fe3d825a8ab0c9c",
-        "android_client_info": {
-          "package_name": "com.company"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBZjeOg0TtNmbRERtVdf88UUbfw3CZOpls"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
+    apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
+    authDomain: "miyjky.firebaseapp.com",
+    databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "miyjky",
+    storageBucket: "miyjky.firebasestorage.app",
+    messagingSenderId: "967414135211",
+    appId: "1:967414135211:web:9b3444523a807626dbfaee"
   };
   firebase.initializeApp(firebaseConfig);
 
@@ -91,12 +63,10 @@
   const dislikeCountElem = document.getElementById('dislikeCount');
 
   // --- Анонімна авторизація ---
-  firebase.auth().signInAnonymously().catch((error) => {
-    console.error("Auth error:", error);
-  });
+  firebase.auth().signInAnonymously().catch(console.error);
 
   let currentUserUID = null;
-  firebase.auth().onAuthStateChanged((user) => {
+  firebase.auth().onAuthStateChanged(user => {
     if (user) {
       currentUserUID = user.uid;
       updateCounters();
@@ -104,7 +74,7 @@
   });
 
   function updateCounters() {
-    db.ref('votes').once('value').then((snapshot) => {
+    db.ref('votes').once('value').then(snapshot => {
       const data = snapshot.val() || {likes:0, dislikes:0, users:{}};
       likeCountElem.innerText = data.likes || 0;
       dislikeCountElem.innerText = data.dislikes || 0;
@@ -115,25 +85,19 @@
     if (!currentUserUID) return alert("Зачекайте, поки відбудеться авторизація...");
 
     const userVoteRef = db.ref('votes/users/' + currentUserUID);
-    userVoteRef.once('value').then((snapshot) => {
+    userVoteRef.once('value').then(snapshot => {
       if (snapshot.exists()) {
         alert("Ви вже проголосували!");
         return;
-      } else {
-        // Записуємо голос користувача
-        userVoteRef.set(type);
-
-        // Оновлюємо загальні лічильники
-        const voteRef = db.ref('votes');
-        voteRef.transaction((currentData) => {
-          if (currentData === null) {
-            currentData = {likes:0, dislikes:0, users:{}};
-          }
-          if (type === 'like') currentData.likes = (currentData.likes || 0) + 1;
-          if (type === 'dislike') currentData.dislikes = (currentData.dislikes || 0) + 1;
-          return currentData;
-        });
       }
+      userVoteRef.set(type);
+      const voteRef = db.ref('votes');
+      voteRef.transaction(currentData => {
+        if (!currentData) currentData = {likes:0, dislikes:0, users:{}};
+        if (type === 'like') currentData.likes = (currentData.likes || 0) + 1;
+        if (type === 'dislike') currentData.dislikes = (currentData.dislikes || 0) + 1;
+        return currentData;
+      });
     });
   }
 
@@ -143,7 +107,7 @@
   }
 
   // --- Реальний час ---
-  db.ref('votes').on('value', (snapshot) => {
+  db.ref('votes').on('value', snapshot => {
     const data = snapshot.val() || {likes:0, dislikes:0};
     likeCountElem.innerText = data.likes || 0;
     dislikeCountElem.innerText = data.dislikes || 0;
@@ -151,4 +115,3 @@
 </script>
 </body>
 </html>
-
