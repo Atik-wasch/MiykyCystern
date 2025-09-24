@@ -23,6 +23,7 @@ textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-
 #commentsList { margin-top: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; }
 .comment { background: #fff; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .comment button { margin-left: 10px; padding: 2px 6px; font-size: 12px; cursor: pointer; }
+input[type="text"] { width: 80%; max-width: 300px; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -30,8 +31,9 @@ textarea { width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-
 <h1>Ласкаво просимо на "Мийки цистерн"</h1>
 <p>Ви можете залишати інформацію про мийки цистерн у коментарях. Автори можуть додавати нові мийки, які з’являтимуться на карті.</p>
 
-<h2>Авторизація через Google</h2>
-<button class="btn btn-main" onclick="signInWithGoogle()">Увійти через Google</button>
+<h2>Анонімний вхід</h2>
+<input type="text" id="userNameInput" placeholder="Введіть ваше ім'я">
+<button class="btn btn-main" onclick="signInAnonymously()">Увійти анонімно</button>
 
 <a id="mapLink" class="btn-main" href="map.html" style="display:none;">🗺 Перейти до карти</a>
 
@@ -71,23 +73,38 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 let currentUserUID = null;
+let currentUserName = '';
 let latestComments = {};
 let isAdmin = false;
 
-// --- Google Auth ---
-function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider)
-    .then(result => {
-      const user = result.user;
+// --- Перевірка збереженого імені ---
+window.addEventListener('load', () => {
+  const savedName = localStorage.getItem('userName');
+  if (savedName) {
+    document.getElementById('userNameInput').value = savedName;
+    currentUserName = savedName;
+  }
+});
+
+// --- Анонімний вхід ---
+function signInAnonymously() {
+  let name = document.getElementById('userNameInput').value.trim();
+  if (!name) return alert("Введіть своє ім'я!");
+  
+  currentUserName = name;
+  localStorage.setItem('userName', name);
+
+  firebase.auth().signInAnonymously()
+    .then(() => {
+      const user = firebase.auth().currentUser;
       currentUserUID = user.uid;
-      alert("Авторизація успішна! Привіт, " + (user.displayName || "користувач"));
+      alert("Вхід анонімний! Привіт, " + currentUserName);
       enableVotingAndComments();
       document.getElementById('mapLink').style.display = 'block';
     })
     .catch(error => {
       console.error(error);
-      alert("Помилка авторизації: " + error.message);
+      alert("Помилка анонімного входу: " + error.message);
     });
 }
 
@@ -137,13 +154,10 @@ function sendComment() {
   if (!commentText) return alert("Введіть коментар!");
   if (!currentUserUID) return alert("Ви не авторизовані!");
   
-  const user = firebase.auth().currentUser;
-  const userName = user.displayName || "Користувач";
-  
   const newCommentRef = db.ref('comments').push();
   newCommentRef.set({
     uid: currentUserUID,
-    name: userName,
+    name: currentUserName,
     text: commentText,
     timestamp: Date.now()
   });
@@ -166,7 +180,6 @@ function renderComments(comments) {
       div.className = 'comment';
       div.innerHTML = `<strong>${comment.name}:</strong> ${comment.text}`;
       
-      // Кнопки для редагування / видалення
       if (comment.uid === currentUserUID) {
         const editBtn = document.createElement('button');
         editBtn.innerText = 'Редагувати';
@@ -179,19 +192,16 @@ function renderComments(comments) {
         delBtn.onclick = () => deleteComment(key);
         div.appendChild(delBtn);
       }
-      
       commentsDiv.appendChild(div);
     });
 }
 
-// --- Редагування коментаря ---
 function editComment(commentId, oldText) {
   const newText = prompt("Редагувати коментар:", oldText);
-  if (newText === null) return; // Відміна
+  if (newText === null) return;
   db.ref('comments/' + commentId + '/text').set(newText);
 }
 
-// --- Видалення коментаря ---
 function deleteComment(commentId) {
   if (!confirm("Ви впевнені, що хочете видалити цей коментар?")) return;
   db.ref('comments/' + commentId).remove();
