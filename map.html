@@ -30,36 +30,12 @@
       z-index: 1001;
       text-align: center;
     }
-    /* Стиль для форми додавання мийки */
-    #addStationForm {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      padding: 15px 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      display: none;
-      z-index: 1002;
-    }
-    #addStationForm input { width: 200px; padding: 6px; margin-bottom: 6px; }
-    #addStationForm button { padding: 6px 12px; cursor: pointer; }
   </style>
 </head>
 <body>
 
 <div id="map"></div>
-
 <div class="author">© 2025 | Автор: Андрій Мочурад</div>
-
-<!-- Форма додавання мийки -->
-<div id="addStationForm">
-  <h4>Додати мийку</h4>
-  <input type="text" id="stationName" placeholder="Назва мийки"><br>
-  <button onclick="saveStation()">Додати</button>
-  <button onclick="closeForm()">Скасувати</button>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -79,8 +55,6 @@
   const db = firebase.database();
 
   let map;
-  let isAdmin = true; // тимчасово ставимо true для тесту (зробимо потім через вхід)
-  let tempLatLng = null;
 
   function initMap(lat, lng) {
     const pos = { lat: lat, lng: lng };
@@ -97,8 +71,8 @@
       icon: { url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }
     });
 
-    // Завантажуємо мийки з Firebase
-    db.ref("stations").on("value", snap => {
+    // Показуємо мийки з Firebase
+    db.ref("stations").once("value").then(snap => {
       const data = snap.val();
       if(!data) return;
       for (let id in data) {
@@ -106,38 +80,14 @@
         new google.maps.Marker({
           position: { lat: point.lat, lng: point.lng },
           map: map,
-          title: point.name
+          title: point.name,
+          icon: { url: "http://maps.google.com/mapfiles/ms/icons/orange-dot.png" }
         });
       }
     });
-
-    // Клік по карті для додавання мийки
-    if(isAdmin){
-      map.addListener('click', function(e){
-        tempLatLng = e.latLng;
-        document.getElementById('addStationForm').style.display = 'block';
-      });
-    }
   }
 
-  // Функції форми
-  function saveStation(){
-    const name = document.getElementById('stationName').value.trim();
-    if(!name){ alert("Введіть назву!"); return; }
-    db.ref("stations").push({
-      name: name,
-      lat: tempLatLng.lat(),
-      lng: tempLatLng.lng()
-    });
-    closeForm();
-  }
-  function closeForm(){
-    document.getElementById('addStationForm').style.display = 'none';
-    document.getElementById('stationName').value = '';
-    tempLatLng = null;
-  }
-
-  // Автоматичне визначення місця
+  // Автоматичне визначення місця користувача
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => { initMap(position.coords.latitude, position.coords.longitude); },
