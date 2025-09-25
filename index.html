@@ -156,7 +156,7 @@ function signInAnon(){
     localStorage.setItem('isAdmin', false);
     enableUI();
     checkUserVote();
-    showModal("Користувач, "+name);
+    showModal("Ви увійшли як, "+name);
   });
 }
 
@@ -214,7 +214,7 @@ function enableUI(){
   document.getElementById('loginSection').style.display = 'none';
 
   // Показ імені
-  document.getElementById('userDisplay').innerText = "Привіт, " + currentUserName;
+  document.getElementById('userDisplay').innerText = "Вітаю, " + currentUserName;
 
   updateCounters();
 }
@@ -299,4 +299,5 @@ function renderComments(c){
 </script>
 </body>
 </html>
+
 
