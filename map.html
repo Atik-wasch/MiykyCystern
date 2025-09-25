@@ -4,36 +4,14 @@
   <meta charset="UTF-8">
   <title>Мийки цистерн – Карта</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: 'Roboto', sans-serif;
-      background: #f8f9fa;
-      overflow: hidden;
-    }
-    #map { width: 100%; height: 100%; }
-    .author {
-      position: fixed;
-      bottom: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      color: red;
-      background: rgba(255,255,255,0.7);
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-weight: bold;
-      z-index: 1001;
-      text-align: center;
-    }
+    html, body { margin:0; padding:0; height:100%; font-family:'Roboto',sans-serif; background:#f8f9fa; overflow:hidden;}
+    #map { width:100%; height:100%; }
+    .author { position:fixed; bottom:5px; left:50%; transform:translateX(-50%); font-size:12px; color:red; background:rgba(255,255,255,0.7); padding:3px 6px; border-radius:4px; font-weight:bold; z-index:1001; text-align:center; }
   </style>
 </head>
 <body>
-
 <div id="map"></div>
 <div class="author">© 2025 | Автор: Андрій Мочурад</div>
 
@@ -41,7 +19,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
     authDomain: "miyjky.firebaseapp.com",
@@ -55,6 +32,7 @@
   const db = firebase.database();
 
   let map;
+  let markers = [];
 
   function initMap(lat, lng) {
     const pos = { lat: lat, lng: lng };
@@ -63,41 +41,47 @@
       zoom: 12
     });
 
-    // Маркер "Ви тут"
+    // Маркер користувача
     new google.maps.Marker({
       position: pos,
       map: map,
       title: "Ви тут",
-      icon: { url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }
+      icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
     });
 
-    // Показуємо мийки з Firebase
-    db.ref("stations").once("value").then(snap => {
-      const data = snap.val();
+    // Показ мийок у реальному часі
+    db.ref("stations").on("value", snapshot => {
+      // Спочатку видаляємо старі маркери
+      markers.forEach(m => m.setMap(null));
+      markers = [];
+
+      const data = snapshot.val();
       if(!data) return;
-      for (let id in data) {
+
+      for(let id in data){
         const point = data[id];
-        new google.maps.Marker({
+        const marker = new google.maps.Marker({
           position: { lat: point.lat, lng: point.lng },
           map: map,
           title: point.name,
-          icon: { url: "http://maps.google.com/mapfiles/ms/icons/orange-dot.png" }
+          icon: "http://maps.google.com/mapfiles/ms/icons/orange-dot.png"
         });
+        markers.push(marker);
       }
     });
   }
 
-  // Автоматичне визначення місця користувача
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => { initMap(position.coords.latitude, position.coords.longitude); },
       () => { initMap(49.0, 32.0); alert("Не вдалося визначити ваше місцезнаходження."); }
     );
-  } else { initMap(49.0, 32.0); alert("Ваш браузер не підтримує геолокацію."); }
-
+  } else {
+    initMap(49.0, 32.0);
+    alert("Ваш браузер не підтримує геолокацію.");
+  }
 </script>
 
-<!-- Google Maps JS API -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCMnpdpKhzsNHe0y2lyf_WBF0g1gU9eTg8"></script>
 </body>
 </html>
