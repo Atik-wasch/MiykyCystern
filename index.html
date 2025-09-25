@@ -5,16 +5,34 @@
 <title>Мийки цистерн</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{font-family:Roboto,sans-serif;text-align:center;padding:10px;background:#f0f2f5;margin:0;overflow-x:hidden;}
-h1{font-size:18px;margin:5px 0;}
-h2{font-size:16px;margin:5px 0;}
-p{font-size:14px;margin:5px 0; color:#0056b3;}
-.btn{margin:3px;padding:6px 12px;font-size:14px;border-radius:6px;border:none;cursor:pointer;overflow:hidden;position:relative;}
-.like{background:#28a745;color:#fff;}
-.like:hover{background:#1e7e34;}
-.dislike{background:#dc3545;color:#fff;}
-.dislike:hover{background:#a71d2a;}
-.btn-main{
+body {
+  font-family: Roboto, sans-serif;
+  text-align: center;
+  padding: 10px;
+  background: #f0f2f5;
+  margin: 0;
+  overflow-x: hidden;
+}
+h1 { font-size: 18px; margin: 5px 0; }
+h2 { font-size: 16px; margin: 5px 0; }
+p  { font-size: 14px; margin: 5px 0; color:#0056b3; }
+
+.btn {
+  margin: 3px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+.like { background:#1c7430; color:#fff; font-size:16px; padding:10px 14px;}
+.like:hover { background:#155d27; }
+.dislike { background:#b02a37; color:#fff; font-size:16px; padding:10px 14px;}
+.dislike:hover { background:#7a1c26; }
+
+.btn-main {
   display:block;
   width:80%;
   max-width:250px;
@@ -31,42 +49,130 @@ p{font-size:14px;margin:5px 0; color:#0056b3;}
   overflow:hidden;
   position:relative;
 }
-.btn-main:hover{background:#005f8d;}
-.map-btn{
-  background-color:#ff8800 !important;
+.btn-main:hover { background:#005f8d; }
+
+textarea,input {
+  width:80%;
+  max-width:250px;
+  padding:6px;
+  font-size:14px;
+  border-radius:4px;
+  border:1px solid #ccc;
+  margin-bottom:5px;
+}
+#commentsList {
+  margin-top:5px;
+  text-align:left;
+  max-width:500px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.comment {
+  background:#e0e0e0;
+  padding:10px;
+  margin-bottom:5px;
+  border-radius:4px;
+  position:relative;
+}
+.comment button {
+  margin-left:3px;
+  padding:2px 4px;
+  font-size:10px;
+  cursor:pointer;
+}
+.comment .comment-actions {
+  position:absolute;
+  top:5px;
+  right:5px;
+}
+.comment .comment-like {
+  font-size:12px;
+  margin-left:5px;
+  background:#007bff;
   color:#fff;
-  font-weight:bold;
-  font-size:16px;
-  box-shadow:0 3px 6px rgba(0,0,0,0.2);
+  border:none;
+  padding:2px 6px;
+  border-radius:4px;
+  cursor:pointer;
 }
-.map-btn:hover{background-color:#cc6e00 !important;transform: scale(1.05);}
-.counters{margin-top:5px;font-size:14px;color:#222;}
-textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radius:4px;border:1px solid #ccc;margin-bottom:5px;}
-#commentsList{margin-top:5px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto;}
-.comment{background:#e0e0e0;padding:10px;margin-bottom:5px;border-radius:4px;position:relative;}
-.comment button{margin-left:3px;padding:2px 4px;font-size:10px;cursor:pointer;}
-.comment .comment-actions{position:absolute;top:5px;right:5px;}
-.comment .comment-like{font-size:12px;margin-left:5px;background:#007bff;color:#fff;border:none;padding:2px 6px;border-radius:4px;cursor:pointer;}
-.comment .comment-like.active{background:#0056b3;}
-.version{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:10px;color:#888;background:rgba(255,255,255,0.7);padding:2px 4px;border-radius:3px;}
-.modal{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity 0.3s ease;
+.comment .comment-like.active { background:#0056b3; }
+.comment .comment-time { font-size:11px; color:#555; margin-top:3px; }
+
+.version {
+  position:fixed;
+  bottom:5px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:10px;
+  color:#888;
+  background:rgba(255,255,255,0.7);
+  padding:2px 4px;
+  border-radius:3px;
 }
-.modal.show{opacity:1;pointer-events:auto;}
-.modal-content{
-  background:#fff;padding:20px 30px;border-radius:10px;
+
+.modal {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.modal.show { opacity:1; pointer-events:auto; }
+.modal-content {
+  background:#fff;
+  padding:20px 30px;
+  border-radius:10px;
   box-shadow:0 4px 10px rgba(0,0,0,0.3);
-  text-align:center;max-width:300px;
+  text-align:center;
+  max-width:300px;
   animation:pop 0.3s ease;
 }
-@keyframes pop{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
-.modal-content h3{margin:0 0 10px;color:#28a745;}
-.modal-content button{background:#28a745;color:#fff;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;}
-.modal-content button:hover{background:#1e7e34;}
-.active-like{background:#1e7e34 !important;}
-.active-dislike{background:#a71d2a !important;}
+@keyframes pop {
+  from{transform:scale(0.8);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+.modal-content h3 { margin:0 0 10px; color:#28a745; }
+.modal-content button {
+  background:#28a745;
+  color:#fff;
+  padding:6px 12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+.modal-content button:hover { background:#1e7e34; }
+
+.active-like { background:#1e7e34 !important; }
+.active-dislike { background:#a71d2a !important; }
+
+/* 🔹 Синьо-фіолетові кнопки */
+.purple-btn {
+  background: linear-gradient(135deg, #6f42c1, #007bff);
+  color: #fff !important;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  display: inline-block;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+.purple-btn:hover {
+  background: linear-gradient(135deg, #5a32a3, #0056b3);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+}
+.purple-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
 </style>
 </head>
 <body>
@@ -82,11 +188,10 @@ textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radiu
   <button class="btn btn-main" onclick="signInAdmin()">Увійти як адмін</button>
 </div>
 
-<!-- Показ імені користувача та кнопка виходу -->
 <h2 id="userDisplay" style="margin-top:10px; font-weight:bold;"></h2>
-<button id="logoutBtn" class="btn btn-main" style="display:none;background:#dc3545;" onclick="logout()">🚪 Вийти</button>
 
-<a id="mapLink" class="btn-main map-btn" href="map.html" style="display:none;">🗺 Перейти до карти</a>
+<!-- 🔹 Кнопка перейти до карти над коментарями -->
+<a id="mapLink" class="purple-btn" href="map.html" style="display:none; margin-bottom:10px;">🗺 Перейти до карти</a>
 
 <h2>Лайки / Дизлайки</h2>
 <button class="btn like" onclick="vote('like')" disabled id="likeBtn">👍</button>
@@ -97,6 +202,26 @@ textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radiu
 <textarea id="commentInput" rows="2" placeholder="Ваш коментар..." disabled></textarea><br>
 <button class="btn btn-main" onclick="sendComment()" disabled>Відправити</button>
 <div id="commentsList"></div>
+
+<!-- 🔹 Кнопка Вийти -->
+<button id="logoutBtn" class="btn btn-main" style="background:#dc3545; display:none;" onclick="logout()">🚪 Вийти</button>
+
+<!-- 🔹 Адмін-панель -->
+<div id="adminPanel" style="display:none; margin-top:20px; text-align:left; max-width:500px; margin-left:auto; margin-right:auto;">
+  <h2>Адмін-панель: Користувачі</h2>
+  <table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr style="background:#ddd;">
+        <th>UID</th>
+        <th>Ім’я</th>
+        <th>Статус</th>
+        <th>Дія</th>
+      </tr>
+    </thead>
+    <tbody id="usersTable">
+    </tbody>
+  </table>
+</div>
 
 <div class="version">Бета-Версія 1.0.0</div>
 
@@ -126,7 +251,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 let currentUserUID = null;
 let currentUserName = null;
-let latestComments = {};
 let isAdmin = false;
 let modalTimeout;
 
@@ -194,21 +318,29 @@ function logout(){
     document.getElementById('mapLink').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'none';
     document.getElementById('userDisplay').innerText = '';
+    document.getElementById('adminPanel').style.display = 'none';
     showModal("Ви вийшли з акаунту!");
   });
 }
 
 // --- Активуємо UI ---
 function enableUI(){
+  if(currentUserUID && currentUserName){
+    saveUserInDB();
+  }
   document.getElementById('likeBtn').disabled = false;
   document.getElementById('dislikeBtn').disabled = false;
   document.querySelector('#commentInput').disabled = false;
   document.querySelector('button[onclick="sendComment()"]').disabled = false;
-  document.getElementById('mapLink').style.display = 'block';
-  document.getElementById('logoutBtn').style.display = 'block';
+  document.getElementById('mapLink').style.display = 'inline-block';
+  document.getElementById('logoutBtn').style.display = 'inline-block';
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('userDisplay').innerText = "Вітаю, " + currentUserName;
   updateCounters();
+  if(isAdmin){
+    document.getElementById('adminPanel').style.display = 'block';
+    loadUsers();
+  }
 }
 
 // --- Модальне вікно ---
@@ -231,17 +363,20 @@ function updateCounters(){
 }
 function vote(type){
   if(!currentUserUID) return showModal("Ви не авторизовані!");
-  const ref = db.ref('votes/users/'+currentUserUID);
-  ref.once('value').then(snap=>{
-    if(snap.exists()) return showModal("Ви вже голосували!");
-    ref.set(type);
-    db.ref('votes').transaction(d=>{
-      if(!d) d={likes:0,dislikes:0,users:{}};
-      if(type==='like') d.likes=(d.likes||0)+1;
-      if(type==='dislike') d.dislikes=(d.dislikes||0)+1;
-      return d;
+  db.ref('users/'+currentUserUID).once('value').then(uSnap=>{
+    if(uSnap.exists() && uSnap.val().blocked) return showModal("Ви заблоковані!");
+    const ref = db.ref('votes/users/'+currentUserUID);
+    ref.once('value').then(snap=>{
+      if(snap.exists()) return showModal("Ви вже голосували!");
+      ref.set(type);
+      db.ref('votes').transaction(d=>{
+        if(!d) d={likes:0,dislikes:0,users:{}};
+        if(type==='like') d.likes=(d.likes||0)+1;
+        if(type==='dislike') d.dislikes=(d.dislikes||0)+1;
+        return d;
+      });
+      markVoted(type);
     });
-    markVoted(type);
   });
 }
 db.ref('votes').on('value', snap=>{
@@ -264,80 +399,119 @@ function markVoted(type){
 
 // --- Коментарі ---
 function sendComment(){
-  const t = document.getElementById('commentInput').value.trim();
-  if(!t) return showModal("Введіть коментар!");
-  if(!currentUserUID) return showModal("Не авторизовані!");
-  db.ref('comments').push().set({
-    uid: currentUserUID,
-    name: currentUserName,
-    text: t,
-    likes: 0,
-    timestamp: Date.now()
+  if(!currentUserUID) return showModal("Ви не авторизовані!");
+  db.ref('users/'+currentUserUID).once('value').then(uSnap=>{
+    if(uSnap.exists() && uSnap.val().blocked) return showModal("Ви заблоковані!");
+    const t = document.getElementById('commentInput').value.trim();
+    if(!t) return showModal("Введіть коментар!");
+    db.ref('comments').push().set({
+      uid: currentUserUID,
+      name: currentUserName,
+      text: t,
+      likes: 0,
+      timestamp: Date.now()
+    });
+    document.getElementById('commentInput').value='';
   });
-  document.getElementById('commentInput').value='';
 }
 
 // --- Відображення коментарів ---
 db.ref('comments').on('value', snap=>{
-  latestComments = snap.val()||{};
+  const latestComments = snap.val()||{};
   renderComments(latestComments);
 });
-
 function renderComments(c){
   const div = document.getElementById('commentsList');
   div.innerHTML='';
   Object.entries(c).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([k,cm])=>{
     const d = document.createElement('div'); 
     d.className='comment';
-    
     let actions = '';
-    // Лайк для коментаря
     actions += `<button class="comment-like" onclick="likeComment('${k}', this)">👍 ${cm.likes||0}</button>`;
-    
-    // Якщо адмін — додаємо редагування і видалення
     if(isAdmin){
       actions += `<div class="comment-actions">
         <button onclick="editComment('${k}')">✏️</button>
         <button onclick="deleteComment('${k}')">🗑</button>
       </div>`;
     }
-    
-    d.innerHTML = `<strong>${cm.name}:</strong> ${cm.text} ${actions}`;
+    const dateStr = new Date(cm.timestamp).toLocaleString();
+    d.innerHTML = `<strong>${cm.name}:</strong> ${cm.text} <div class="comment-time">${dateStr}</div> ${actions}`;
     div.appendChild(d);
   });
 }
 
-// --- Лайк для коментаря ---
+// --- Лайк коментаря ---
 function likeComment(key, btn){
   if(!currentUserUID) return showModal("Ви не авторизовані!");
-  const userLikeRef = db.ref('commentLikes/'+key+'/'+currentUserUID);
-  userLikeRef.once('value').then(snap=>{
-    if(snap.exists()) return showModal("Ви вже лайкнули цей коментар!");
-    userLikeRef.set(true);
-    const commentRef = db.ref('comments/'+key);
-    commentRef.once('value').then(csnap=>{
-      const data = csnap.val();
-      commentRef.update({likes:(data.likes||0)+1});
-      btn.innerText = `👍 ${(data.likes||0)+1}`;
-      btn.classList.add('active');
+  db.ref('users/'+currentUserUID).once('value').then(uSnap=>{
+    if(uSnap.exists() && uSnap.val().blocked) return showModal("Ви заблоковані!");
+    const userLikeRef = db.ref('commentLikes/'+key+'/'+currentUserUID);
+    userLikeRef.once('value').then(snap=>{
+      if(snap.exists()) return showModal("Ви вже лайкнули цей коментар!");
+      userLikeRef.set(true);
+      const commentRef = db.ref('comments/'+key);
+      commentRef.once('value').then(csnap=>{
+        const data = csnap.val();
+        commentRef.update({likes:(data.likes||0)+1});
+        btn.innerText = `👍 ${(data.likes||0)+1}`;
+        btn.classList.add('active');
+      });
     });
   });
 }
 
-// --- Редагування коментаря (адмін) ---
+// --- Редагування / видалення коментарів ---
 function editComment(key){
   const newText = prompt("Редагуйте коментар:");
   if(newText !== null){
     db.ref('comments/'+key).update({text:newText});
   }
 }
-
-// --- Видалення коментаря (адмін) ---
 function deleteComment(key){
   if(confirm("Видалити коментар?")){
     db.ref('comments/'+key).remove();
     db.ref('commentLikes/'+key).remove();
   }
+}
+
+// --- Адмін-панель ---
+function saveUserInDB(){
+  if(!currentUserUID) return;
+  db.ref('users/'+currentUserUID).set({
+    name: currentUserName,
+    blocked: false,
+    lastLogin: Date.now()
+  });
+}
+function loadUsers(){
+  if(!isAdmin) return;
+  const tbody = document.getElementById('usersTable');
+  tbody.innerHTML = '';
+  db.ref('users').once('value').then(snap=>{
+    const users = snap.val()||{};
+    Object.entries(users).forEach(([uid, u])=>{
+      const tr = document.createElement('tr');
+      const status = u.blocked ? 'Заблокований' : 'Активний';
+      const btnText = u.blocked ? 'Розблокувати' : 'Блокувати';
+      tr.innerHTML = `
+        <td>${uid}</td>
+        <td>${u.name}</td>
+        <td>${status}</td>
+        <td><button onclick="toggleBlock('${uid}')">${btnText}</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+}
+function toggleBlock(uid){
+  db.ref('users/'+uid).once('value').then(snap=>{
+    if(!snap.exists()) return;
+    const user = snap.val();
+    const newStatus = !user.blocked;
+    db.ref('users/'+uid).update({blocked:newStatus});
+    showModal(`Користувач ${user.name} ${newStatus ? 'заблокований' : 'розблокований'}`);
+    loadUsers();
+  });
 }
 </script>
 </body>
