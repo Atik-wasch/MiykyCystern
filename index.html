@@ -5,174 +5,47 @@
 <title>Мийки цистерн</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body {
-  font-family: Roboto, sans-serif;
-  text-align: center;
-  padding: 10px;
-  background: #f0f2f5;
-  margin: 0;
-  overflow-x: hidden;
-}
-h1 { font-size: 18px; margin: 5px 0; }
-h2 { font-size: 16px; margin: 5px 0; }
-p  { font-size: 14px; margin: 5px 0; color:#0056b3; }
+body { font-family: Roboto, sans-serif; text-align:center; padding:10px; background:#f0f2f5; margin:0; overflow-x:hidden; }
+h1 { font-size:18px; margin:5px 0; }
+h2 { font-size:16px; margin:5px 0; }
+p  { font-size:14px; margin:5px 0; color:#0056b3; }
 
-.btn {
-  margin: 3px;
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-}
+.btn { margin:3px; padding:6px 12px; font-size:14px; border-radius:6px; border:none; cursor:pointer; overflow:hidden; position:relative; }
 .like { background:#1c7430; color:#fff; font-size:16px; padding:10px 14px;}
 .like:hover { background:#155d27; }
 .dislike { background:#b02a37; color:#fff; font-size:16px; padding:10px 14px;}
 .dislike:hover { background:#7a1c26; }
 
-.btn-main {
-  display:block;
-  width:80%;
-  max-width:250px;
-  margin:5px auto;
-  padding:10px 0;
-  background:#0088cc;
-  color:#fff;
-  border-radius:6px;
-  font-size:15px;
-  cursor:pointer;
-  border:none;
-  font-weight:bold;
-  transition: all 0.3s ease;
-  overflow:hidden;
-  position:relative;
-}
+.btn-main { display:block; width:80%; max-width:250px; margin:5px auto; padding:10px 0; background:#0088cc; color:#fff; border-radius:6px; font-size:15px; cursor:pointer; border:none; font-weight:bold; transition: all 0.3s ease; overflow:hidden; position:relative; }
 .btn-main:hover { background:#005f8d; }
 
-textarea,input {
-  width:80%;
-  max-width:250px;
-  padding:6px;
-  font-size:14px;
-  border-radius:4px;
-  border:1px solid #ccc;
-  margin-bottom:5px;
-}
-#commentsList {
-  margin-top:5px;
-  text-align:left;
-  max-width:500px;
-  margin-left:auto;
-  margin-right:auto;
-}
-.comment {
-  background:#e0e0e0;
-  padding:10px;
-  margin-bottom:5px;
-  border-radius:4px;
-  position:relative;
-}
-.comment button {
-  margin-left:3px;
-  padding:2px 4px;
-  font-size:10px;
-  cursor:pointer;
-}
-.comment .comment-actions {
-  position:absolute;
-  top:5px;
-  right:5px;
-}
-.comment .comment-like {
-  font-size:12px;
-  margin-left:5px;
-  background:#007bff;
-  color:#fff;
-  border:none;
-  padding:2px 6px;
-  border-radius:4px;
-  cursor:pointer;
-}
+textarea,input { width:80%; max-width:250px; padding:6px; font-size:14px; border-radius:4px; border:1px solid #ccc; margin-bottom:5px; }
+
+#commentsList { margin-top:5px; text-align:left; max-width:500px; margin-left:auto; margin-right:auto; }
+.comment { background:#e0e0e0; padding:10px; margin-bottom:5px; border-radius:4px; position:relative; }
+.comment button { margin-left:3px; padding:2px 4px; font-size:10px; cursor:pointer; }
+.comment .comment-actions { position:absolute; top:5px; right:5px; }
+.comment .comment-like { font-size:12px; margin-left:5px; background:#007bff; color:#fff; border:none; padding:2px 6px; border-radius:4px; cursor:pointer; }
 .comment .comment-like.active { background:#0056b3; }
 .comment .comment-time { font-size:11px; color:#555; margin-top:3px; }
 
-.version {
-  position:fixed;
-  bottom:5px;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:10px;
-  color:#888;
-  background:rgba(255,255,255,0.7);
-  padding:2px 4px;
-  border-radius:3px;
-}
+.version { position:fixed; bottom:5px; left:50%; transform:translateX(-50%); font-size:10px; color:#888; background:rgba(255,255,255,0.7); padding:2px 4px; border-radius:3px; }
 
-.modal {
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.4);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 0.3s ease;
-}
+.modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
 .modal.show { opacity:1; pointer-events:auto; }
-.modal-content {
-  background:#fff;
-  padding:20px 30px;
-  border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.3);
-  text-align:center;
-  max-width:300px;
-  animation:pop 0.3s ease;
-}
-@keyframes pop {
-  from{transform:scale(0.8);opacity:0;}
-  to{transform:scale(1);opacity:1;}
-}
+.modal-content { background:#fff; padding:20px 30px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); text-align:center; max-width:300px; animation:pop 0.3s ease; }
+@keyframes pop { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
 .modal-content h3 { margin:0 0 10px; color:#28a745; }
-.modal-content button {
-  background:#28a745;
-  color:#fff;
-  padding:6px 12px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
+.modal-content button { background:#28a745; color:#fff; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; }
 .modal-content button:hover { background:#1e7e34; }
 
 .active-like { background:#1e7e34 !important; }
 .active-dislike { background:#a71d2a !important; }
 
 /* 🔹 Синьо-фіолетові кнопки */
-.purple-btn {
-  background: linear-gradient(135deg, #6f42c1, #007bff);
-  color: #fff !important;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 14px;
-  font-size: 13px;
-  display: inline-block;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
-}
-.purple-btn:hover {
-  background: linear-gradient(135deg, #5a32a3, #0056b3);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 5px 12px rgba(0,0,0,0.25);
-}
-.purple-btn:active {
-  transform: scale(0.96);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
+.purple-btn { background: linear-gradient(135deg, #6f42c1, #007bff); color: #fff !important; font-weight: bold; border: none; border-radius: 10px; padding: 8px 14px; font-size: 13px; display: inline-block; box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+.purple-btn:hover { background: linear-gradient(135deg, #5a32a3, #0056b3); transform: translateY(-2px) scale(1.05); box-shadow: 0 5px 12px rgba(0,0,0,0.25); }
+.purple-btn:active { transform: scale(0.96); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 </style>
 </head>
 <body>
@@ -190,7 +63,6 @@ textarea,input {
 
 <h2 id="userDisplay" style="margin-top:10px; font-weight:bold;"></h2>
 
-<!-- 🔹 Кнопка перейти до карти над коментарями -->
 <a id="mapLink" class="purple-btn" href="map.html" style="display:none; margin-bottom:10px;">🗺 Перейти до карти</a>
 
 <h2></h2>
@@ -203,10 +75,8 @@ textarea,input {
 <button class="btn btn-main" onclick="sendComment()" disabled>Відправити</button>
 <div id="commentsList"></div>
 
-<!-- 🔹 Кнопка Вийти -->
 <button id="logoutBtn" class="btn btn-main" style="background:#dc3545; display:none;" onclick="logout()">🚪 Вийти</button>
 
-<!-- 🔹 Адмін-панель -->
 <div id="adminPanel" style="display:none; margin-top:20px; text-align:left; max-width:500px; margin-left:auto; margin-right:auto;">
   <h2>Адмін-панель: Користувачі</h2>
   <table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse:collapse;">
@@ -218,8 +88,7 @@ textarea,input {
         <th>Дія</th>
       </tr>
     </thead>
-    <tbody id="usersTable">
-    </tbody>
+    <tbody id="usersTable"></tbody>
   </table>
 </div>
 
@@ -232,6 +101,8 @@ textarea,input {
     <button onclick="closeModal()">Закрити</button>
   </div>
 </div>
+
+<audio id="commentSound" src="https://www.myinstants.com/media/sounds/notification.mp3" preload="auto"></audio>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -253,6 +124,7 @@ let currentUserUID = null;
 let currentUserName = null;
 let isAdmin = false;
 let modalTimeout;
+let lastCommentTimestamp = 0;
 
 // --- Автовхід ---
 window.onload = function(){
@@ -281,7 +153,7 @@ function signInAnon(){
     localStorage.setItem('isAdmin', false);
     enableUI();
     checkUserVote();
-    showModal("Ви увійшли як, "+name);
+    showModal("Ви увійшли як " + name);
   });
 }
 
@@ -325,9 +197,7 @@ function logout(){
 
 // --- Активуємо UI ---
 function enableUI(){
-  if(currentUserUID && currentUserName){
-    saveUserInDB();
-  }
+  if(currentUserUID && currentUserName) saveUserInDB();
   document.getElementById('likeBtn').disabled = false;
   document.getElementById('dislikeBtn').disabled = false;
   document.querySelector('#commentInput').disabled = false;
@@ -419,15 +289,23 @@ function sendComment(){
 db.ref('comments').on('value', snap=>{
   const latestComments = snap.val()||{};
   renderComments(latestComments);
+
+  const timestamps = Object.values(latestComments).map(c=>c.timestamp);
+  Object.values(latestComments).forEach(c=>{
+    if(c.timestamp > lastCommentTimestamp && c.uid !== currentUserUID){
+      document.getElementById('commentSound').play().catch(()=>{});
+    }
+  });
+  lastCommentTimestamp = timestamps.length ? Math.max(...timestamps) : 0;
 });
+
 function renderComments(c){
   const div = document.getElementById('commentsList');
   div.innerHTML='';
   Object.entries(c).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([k,cm])=>{
     const d = document.createElement('div'); 
     d.className='comment';
-    let actions = '';
-    actions += `<button class="comment-like" onclick="likeComment('${k}', this)">👍 ${cm.likes||0}</button>`;
+    let actions = `<button class="comment-like${cm.liked ? ' active' : ''}" onclick="likeComment('${k}', this)">👍 ${cm.likes||0}</button>`;
     if(isAdmin){
       actions += `<div class="comment-actions">
         <button onclick="editComment('${k}')">✏️</button>
@@ -460,12 +338,10 @@ function likeComment(key, btn){
   });
 }
 
-// --- Редагування / видалення коментарів ---
+// --- Редагування / видалення ---
 function editComment(key){
   const newText = prompt("Редагуйте коментар:");
-  if(newText !== null){
-    db.ref('comments/'+key).update({text:newText});
-  }
+  if(newText !== null) db.ref('comments/'+key).update({text:newText});
 }
 function deleteComment(key){
   if(confirm("Видалити коментар?")){
@@ -477,11 +353,7 @@ function deleteComment(key){
 // --- Адмін-панель ---
 function saveUserInDB(){
   if(!currentUserUID) return;
-  db.ref('users/'+currentUserUID).set({
-    name: currentUserName,
-    blocked: false,
-    lastLogin: Date.now()
-  });
+  db.ref('users/'+currentUserUID).set({name:currentUserName, blocked:false, lastLogin:Date.now()});
 }
 function loadUsers(){
   if(!isAdmin) return;
@@ -489,16 +361,11 @@ function loadUsers(){
   tbody.innerHTML = '';
   db.ref('users').once('value').then(snap=>{
     const users = snap.val()||{};
-    Object.entries(users).forEach(([uid, u])=>{
+    Object.entries(users).forEach(([uid,u])=>{
       const tr = document.createElement('tr');
       const status = u.blocked ? 'Заблокований' : 'Активний';
       const btnText = u.blocked ? 'Розблокувати' : 'Блокувати';
-      tr.innerHTML = `
-        <td>${uid}</td>
-        <td>${u.name}</td>
-        <td>${status}</td>
-        <td><button onclick="toggleBlock('${uid}')">${btnText}</button></td>
-      `;
+      tr.innerHTML = `<td>${uid}</td><td>${u.name}</td><td>${status}</td><td><button onclick="toggleBlock('${uid}')">${btnText}</button></td>`;
       tbody.appendChild(tr);
     });
   });
@@ -516,4 +383,3 @@ function toggleBlock(uid){
 </script>
 </body>
 </html>
-
