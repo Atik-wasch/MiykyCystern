@@ -15,62 +15,45 @@
 <div id="map"></div>
 <div class="author">© 2025 | Автор: Андрій Мочурад</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCG5mxvBurQdQeSz6dIo-Qd5UJEwnhCxpA",
-    authDomain: "miyjky.firebaseapp.com",
-    databaseURL: "https://miyjky-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "miyjky",
-    storageBucket: "miyjky.firebasestorage.app",
-    messagingSenderId: "967414135211",
-    appId: "1:967414135211:web:9b3444523a807626dbfaee"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
   let map;
-  let markers = [];
+  let userMarker;
+
+  // Готові точки мийок
+  const stations = [
+    { name: "Мийка Львів", lat: 49.8397, lng: 24.0297 },
+    { name: "Мийка Київ", lat: 50.4501, lng: 30.5234 },
+    { name: "Мийка Харків", lat: 50.0041, lng: 36.2319 },
+    { name: "Мийка Одеса", lat: 46.4825, lng: 30.7233 }
+  ];
 
   function initMap(lat, lng) {
     const pos = { lat: lat, lng: lng };
     map = new google.maps.Map(document.getElementById("map"), {
       center: pos,
-      zoom: 12
+      zoom: 6
     });
 
     // Маркер користувача
-    new google.maps.Marker({
+    userMarker = new google.maps.Marker({
       position: pos,
       map: map,
       title: "Ви тут",
       icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
     });
 
-    // Показ мийок у реальному часі
-    db.ref("stations").on("value", snapshot => {
-      // Спочатку видаляємо старі маркери
-      markers.forEach(m => m.setMap(null));
-      markers = [];
-
-      const data = snapshot.val();
-      if(!data) return;
-
-      for(let id in data){
-        const point = data[id];
-        const marker = new google.maps.Marker({
-          position: { lat: point.lat, lng: point.lng },
-          map: map,
-          title: point.name,
-          icon: "http://maps.google.com/mapfiles/ms/icons/orange-dot.png"
-        });
-        markers.push(marker);
-      }
+    // Маркери мийок
+    stations.forEach(station => {
+      new google.maps.Marker({
+        position: { lat: station.lat, lng: station.lng },
+        map: map,
+        title: station.name,
+        icon: "http://maps.google.com/mapfiles/ms/icons/orange-dot.png"
+      });
     });
   }
 
+  // Автоматичне визначення місця користувача
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => { initMap(position.coords.latitude, position.coords.longitude); },
