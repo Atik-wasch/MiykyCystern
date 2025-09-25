@@ -8,28 +8,78 @@
 body{font-family:Roboto,sans-serif;text-align:center;padding:10px;background:#f8f9fa;margin:0;}
 h1{font-size:18px;margin:5px 0;}
 h2{font-size:16px;margin:5px 0;}
-p{font-size:14px;margin:5px 0;}
-.btn{margin:3px;padding:6px 12px;font-size:14px;border-radius:6px;border:none;cursor:pointer;}
+p{font-size:14px;margin:5px 0; color:#0056b3;}
+.btn{margin:3px;padding:6px 12px;font-size:14px;border-radius:6px;border:none;cursor:pointer;overflow:hidden;position:relative;}
 .like{background:#28a745;color:#fff;}
 .like:hover{background:#1e7e34;}
 .dislike{background:#dc3545;color:#fff;}
 .dislike:hover{background:#a71d2a;}
-.btn-main{display:block;width:80%;max-width:250px;margin:5px auto;padding:8px 0;background:#0088cc;color:#fff;border-radius:6px;font-size:14px;cursor:pointer;border:none;}
+.btn-main{
+  display:block;
+  width:80%;
+  max-width:250px;
+  margin:5px auto;
+  padding:10px 0;
+  background:#0088cc;
+  color:#fff;
+  border-radius:6px;
+  font-size:15px;
+  cursor:pointer;
+  border:none;
+  font-weight:bold;
+  transition: all 0.3s ease;
+  overflow:hidden;
+  position:relative;
+}
 .btn-main:hover{background:#005f8d;}
-.map-btn{background-color:#28a745;color:#fff;}
-.map-btn:hover{background-color:#1e7e34;}
+.map-btn{
+  background-color:#ff8800 !important;
+  color:#fff;
+  font-weight:bold;
+  font-size:16px;
+  box-shadow:0 3px 6px rgba(0,0,0,0.2);
+}
+.map-btn:hover{background-color:#cc6e00 !important;transform: scale(1.05);}
+.ripple{
+  position:absolute;
+  border-radius:50%;
+  transform:scale(0);
+  animation:ripple 0.6s linear;
+  background-color:rgba(255,255,255,0.6);
+}
+@keyframes ripple{
+  to{transform:scale(4);opacity:0;}
+}
 .counters{margin-top:5px;font-size:14px;color:#222;}
 textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radius:4px;border:1px solid #ccc;margin-bottom:5px;}
 #commentsList{margin-top:5px;text-align:left;max-width:350px;margin-left:auto;margin-right:auto;}
 .comment{background:#fff;padding:6px;margin-bottom:5px;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);}
 .comment button{margin-left:3px;padding:2px 4px;font-size:10px;cursor:pointer;}
 .version{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:10px;color:#888;background:rgba(255,255,255,0.7);padding:2px 4px;border-radius:3px;}
+
+/* Стильне повідомлення */
+.modal{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.3s ease;
+}
+.modal.show{opacity:1;pointer-events:auto;}
+.modal-content{
+  background:#fff;padding:20px 30px;border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  text-align:center;max-width:300px;
+  animation:pop 0.3s ease;
+}
+@keyframes pop{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-content h3{margin:0 0 10px;color:#28a745;}
+.modal-content button{background:#28a745;color:#fff;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;}
+.modal-content button:hover{background:#1e7e34;}
 </style>
 </head>
 <body>
 
 <h1>Мийки цистерн</h1>
-<p>Залишайте відгуки про мийки в коментарях.Нові миийки будуть показані на карті.Проект в активному розвитку.</p>
+<p>Залишайте відгуки про мийки в коментарях. Нові мийки теж можна писати в коментарях і вони будуть добавлені на карту.</p>
 
 <h2>Вхід користувача</h2>
 <input type="text" id="userNameInput" placeholder="Ваше ім'я">
@@ -53,6 +103,15 @@ textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radiu
 
 <div class="version">Бета-Версія 1.0.0</div>
 
+<!-- Модальне вікно -->
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <h3>✅ Вхід успішний!</h3>
+    <p id="modalText"></p>
+    <button onclick="closeModal()">Закрити</button>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -75,6 +134,20 @@ let currentUserName = null;
 let latestComments = {};
 let isAdmin = false;
 
+// --- Ripple ефект для кнопок ---
+document.addEventListener("click", function(e){
+  if(e.target.classList.contains("btn-main")){
+    let circle=document.createElement("span");
+    circle.classList.add("ripple");
+    let rect=e.target.getBoundingClientRect();
+    circle.style.width=circle.style.height=Math.max(rect.width,rect.height)+"px";
+    circle.style.left=(e.clientX-rect.left-circle.offsetWidth/2)+"px";
+    circle.style.top=(e.clientY-rect.top-circle.offsetHeight/2)+"px";
+    e.target.appendChild(circle);
+    setTimeout(()=>circle.remove(),600);
+  }
+});
+
 // --- Відновлення імені після перезавантаження ---
 window.onload = function(){
   const savedName = localStorage.getItem('userName');
@@ -88,14 +161,14 @@ window.onload = function(){
 function signInAnon(){
   let name = document.getElementById('userNameInput').value.trim();
   if(!name && localStorage.getItem('userName')) name = localStorage.getItem('userName');
-  if(!name) return alert("Введіть ім'я!");
+  if(!name) return showModal("Введіть ім'я!");
   firebase.auth().signInAnonymously().then(res=>{
     currentUserUID = res.user.uid;
     currentUserName = name;
     localStorage.setItem('userName', name);
     enableUI();
-    alert("Вхід успішний! Привіт, "+name);
-  }).catch(err=>alert("Помилка: "+err.message));
+    showModal("Привіт, "+name);
+  });
 }
 
 // --- Вхід адміна ---
@@ -107,9 +180,9 @@ function signInAdmin(){
       currentUserUID = res.user.uid;
       currentUserName = "Адмін";
       enableUI();
-      alert("Вхід адміна успішний!");
+      showModal("Вхід адміна успішний!");
     });
-  }else alert("Невірний ключ!");
+  }else showModal("❌ Невірний ключ!");
 }
 
 // --- Активуємо UI ---
@@ -122,6 +195,18 @@ function enableUI(){
   updateCounters();
 }
 
+// --- Модальне вікно ---
+let modalTimeout;
+function showModal(msg){
+  document.getElementById("modalText").innerText = msg;
+  document.getElementById("successModal").classList.add("show");
+  clearTimeout(modalTimeout);
+  modalTimeout = setTimeout(()=>closeModal(),3000); // авто-закриття через 3 сек
+}
+function closeModal(){
+  document.getElementById("successModal").classList.remove("show");
+}
+
 // --- Лайки/Дизлайки ---
 function updateCounters(){
   db.ref('votes').once('value').then(snap=>{
@@ -131,10 +216,10 @@ function updateCounters(){
   });
 }
 function vote(type){
-  if(!currentUserUID) return alert("Ви не авторизовані!");
+  if(!currentUserUID) return showModal("Ви не авторизовані!");
   const ref = db.ref('votes/users/'+currentUserUID);
   ref.once('value').then(snap=>{
-    if(snap.exists()) return alert("Ви вже голосували!");
+    if(snap.exists()) return showModal("Ви вже голосували!");
     ref.set(type);
     db.ref('votes').transaction(d=>{
       if(!d) d={likes:0,dislikes:0,users:{}};
@@ -153,8 +238,8 @@ db.ref('votes').on('value', snap=>{
 // --- Коментарі ---
 function sendComment(){
   const t = document.getElementById('commentInput').value.trim();
-  if(!t) return alert("Введіть коментар!");
-  if(!currentUserUID) return alert("Не авторизовані!");
+  if(!t) return showModal("Введіть коментар!");
+  if(!currentUserUID) return showModal("Не авторизовані!");
   db.ref('comments').push().set({
     uid: currentUserUID,
     name: currentUserName,
@@ -199,4 +284,3 @@ function replyComment(id,name){const r=prompt("Відповідь для "+name+
 
 </body>
 </html>
-
