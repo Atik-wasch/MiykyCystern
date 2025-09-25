@@ -5,7 +5,7 @@
 <title>Мийки цистерн</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{font-family:Roboto,sans-serif;text-align:center;padding:10px;background:#f8f9fa;margin:0;}
+body{font-family:Roboto,sans-serif;text-align:center;padding:10px;background:#f8f9fa;margin:0;overflow-x:hidden;}
 h1{font-size:18px;margin:5px 0;}
 h2{font-size:16px;margin:5px 0;}
 p{font-size:14px;margin:5px 0; color:#0056b3;}
@@ -40,24 +40,12 @@ p{font-size:14px;margin:5px 0; color:#0056b3;}
   box-shadow:0 3px 6px rgba(0,0,0,0.2);
 }
 .map-btn:hover{background-color:#cc6e00 !important;transform: scale(1.05);}
-.ripple{
-  position:absolute;
-  border-radius:50%;
-  transform:scale(0);
-  animation:ripple 0.6s linear;
-  background-color:rgba(255,255,255,0.6);
-}
-@keyframes ripple{
-  to{transform:scale(4);opacity:0;}
-}
 .counters{margin-top:5px;font-size:14px;color:#222;}
 textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radius:4px;border:1px solid #ccc;margin-bottom:5px;}
 #commentsList{margin-top:5px;text-align:left;max-width:350px;margin-left:auto;margin-right:auto;}
 .comment{background:#fff;padding:6px;margin-bottom:5px;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.1);}
 .comment button{margin-left:3px;padding:2px 4px;font-size:10px;cursor:pointer;}
 .version{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:10px;color:#888;background:rgba(255,255,255,0.7);padding:2px 4px;border-radius:3px;}
-
-/* Стильне повідомлення */
 .modal{
   position:fixed;top:0;left:0;width:100%;height:100%;
   background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;
@@ -74,26 +62,33 @@ textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radiu
 .modal-content h3{margin:0 0 10px;color:#28a745;}
 .modal-content button{background:#28a745;color:#fff;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;}
 .modal-content button:hover{background:#1e7e34;}
+/* Активні кнопки */
+.active-like{background:#1e7e34 !important;}
+.active-dislike{background:#a71d2a !important;}
 </style>
 </head>
 <body>
 
 <h1>Мийки цистерн</h1>
-<p>Залишайте відгуки про мийки в коментарях. Нові мийки теж можна писати в коментарях і вони будуть добавлені на карту.</p>
+<p>Залишайте відгуки про мийки в коментарях. Нові мийки теж можна писати в коментарях і вони будуть додані на карту.</p>
 
-<h2>Вхід користувача</h2>
-<input type="text" id="userNameInput" placeholder="Ваше ім'я">
-<button class="btn btn-main" onclick="signInAnon()">Увійти</button>
+<!-- Поля для входу -->
+<div id="loginSection">
+  <input type="text" id="userNameInput" placeholder="Введіть ім'я">
+  <button class="btn btn-main" onclick="signInAnon()">Увійти</button>
+  <input type="password" id="adminKey" placeholder="Ключ адміна">
+  <button class="btn btn-main" onclick="signInAdmin()">Увійти як адмін</button>
+</div>
 
-<h2>Вхід адміна</h2>
-<input type="password" id="adminKey" placeholder="Ключ адміна">
-<button class="btn btn-main" onclick="signInAdmin()">Увійти як адмін</button>
+<!-- Показ імені користувача та кнопка виходу -->
+<h2 id="userDisplay" style="margin-top:10px; font-weight:bold;"></h2>
+<button id="logoutBtn" class="btn btn-main" style="display:none;background:#dc3545;" onclick="logout()">🚪 Вийти</button>
 
 <a id="mapLink" class="btn-main map-btn" href="map.html" style="display:none;">🗺 Перейти до карти</a>
 
-<h2>Лайки/Дизлайки</h2>
-<button class="btn like" onclick="vote('like')" disabled>👍</button>
-<button class="btn dislike" onclick="vote('dislike')" disabled>👎</button>
+<h2></h2>
+<button class="btn like" onclick="vote('like')" disabled id="likeBtn">👍</button>
+<button class="btn dislike" onclick="vote('dislike')" disabled id="dislikeBtn">👎</button>
 <div class="counters">Лайки: <span id="likeCount">0</span> | Дизлайки: <span id="dislikeCount">0</span></div>
 
 <h2>Коментарі</h2>
@@ -103,10 +98,9 @@ textarea,input{width:80%;max-width:250px;padding:6px;font-size:14px;border-radiu
 
 <div class="version">Бета-Версія 1.0.0</div>
 
-<!-- Модальне вікно -->
 <div id="successModal" class="modal">
   <div class="modal-content">
-    <h3>✅ Вхід успішний!</h3>
+    <h3>✅ Повідомлення</h3>
     <p id="modalText"></p>
     <button onclick="closeModal()">Закрити</button>
   </div>
@@ -133,40 +127,35 @@ let currentUserUID = null;
 let currentUserName = null;
 let latestComments = {};
 let isAdmin = false;
+let modalTimeout;
 
-// --- Ripple ефект для кнопок ---
-document.addEventListener("click", function(e){
-  if(e.target.classList.contains("btn-main")){
-    let circle=document.createElement("span");
-    circle.classList.add("ripple");
-    let rect=e.target.getBoundingClientRect();
-    circle.style.width=circle.style.height=Math.max(rect.width,rect.height)+"px";
-    circle.style.left=(e.clientX-rect.left-circle.offsetWidth/2)+"px";
-    circle.style.top=(e.clientY-rect.top-circle.offsetHeight/2)+"px";
-    e.target.appendChild(circle);
-    setTimeout(()=>circle.remove(),600);
-  }
-});
-
-// --- Відновлення імені після перезавантаження ---
+// --- Автовхід ---
 window.onload = function(){
+  const savedUID = localStorage.getItem('userUID');
   const savedName = localStorage.getItem('userName');
-  if(savedName){
-    document.getElementById('userNameInput').value = savedName;
+  const savedAdmin = localStorage.getItem('isAdmin') === 'true';
+  if(savedUID && savedName){
+    currentUserUID = savedUID;
     currentUserName = savedName;
+    isAdmin = savedAdmin;
+    enableUI();
+    checkUserVote();
   }
 }
 
-// --- Анонімний вхід користувача ---
+// --- Вхід користувача ---
 function signInAnon(){
   let name = document.getElementById('userNameInput').value.trim();
-  if(!name && localStorage.getItem('userName')) name = localStorage.getItem('userName');
   if(!name) return showModal("Введіть ім'я!");
   firebase.auth().signInAnonymously().then(res=>{
     currentUserUID = res.user.uid;
     currentUserName = name;
+    isAdmin = false;
+    localStorage.setItem('userUID', currentUserUID);
     localStorage.setItem('userName', name);
+    localStorage.setItem('isAdmin', false);
     enableUI();
+    checkUserVote();
     showModal("Привіт, "+name);
   });
 }
@@ -179,35 +168,68 @@ function signInAdmin(){
     firebase.auth().signInAnonymously().then(res=>{
       currentUserUID = res.user.uid;
       currentUserName = "Адмін";
+      localStorage.setItem('userUID', currentUserUID);
+      localStorage.setItem('userName', currentUserName);
+      localStorage.setItem('isAdmin', true);
       enableUI();
+      checkUserVote();
       showModal("Вхід адміна успішний!");
     });
-  }else showModal("❌ Невірний ключ!");
+  } else showModal("❌ Невірний ключ!");
 }
 
-// --- Активуємо UI ---
+// --- Вийти ---
+function logout(){
+  firebase.auth().signOut().then(()=>{
+    localStorage.clear();
+    currentUserUID = null;
+    currentUserName = null;
+    isAdmin = false;
+
+    // Показуємо поля для входу
+    document.getElementById('loginSection').style.display = 'block';
+
+    document.getElementById('likeBtn').disabled = true;
+    document.getElementById('dislikeBtn').disabled = true;
+    document.querySelector('#commentInput').disabled = true;
+    document.querySelector('button[onclick="sendComment()"]').disabled = true;
+    document.getElementById('mapLink').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('userDisplay').innerText = '';
+
+    showModal("Ви вийшли з акаунту!");
+  });
+}
+
+// --- Активуємо UI після входу ---
 function enableUI(){
-  document.querySelector('.like').disabled = false;
-  document.querySelector('.dislike').disabled = false;
+  document.getElementById('likeBtn').disabled = false;
+  document.getElementById('dislikeBtn').disabled = false;
   document.querySelector('#commentInput').disabled = false;
   document.querySelector('button[onclick="sendComment()"]').disabled = false;
   document.getElementById('mapLink').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'block';
+
+  // Ховаємо поля для входу
+  document.getElementById('loginSection').style.display = 'none';
+
+  // Показ імені
+  document.getElementById('userDisplay').innerText = "Привіт, " + currentUserName;
+
   updateCounters();
 }
 
 // --- Модальне вікно ---
-let modalTimeout;
 function showModal(msg){
   document.getElementById("modalText").innerText = msg;
-  document.getElementById("successModal").classList.add("show");
+  const modal = document.getElementById("successModal");
+  modal.classList.add("show");
   clearTimeout(modalTimeout);
-  modalTimeout = setTimeout(()=>closeModal(),3000); // авто-закриття через 3 сек
+  modalTimeout = setTimeout(()=>closeModal(),3000);
 }
-function closeModal(){
-  document.getElementById("successModal").classList.remove("show");
-}
+function closeModal(){ document.getElementById("successModal").classList.remove("show"); }
 
-// --- Лайки/Дизлайки ---
+// --- Голосування ---
 function updateCounters(){
   db.ref('votes').once('value').then(snap=>{
     const d = snap.val() || {likes:0, dislikes:0};
@@ -227,6 +249,7 @@ function vote(type){
       if(type==='dislike') d.dislikes=(d.dislikes||0)+1;
       return d;
     });
+    markVoted(type);
   });
 }
 db.ref('votes').on('value', snap=>{
@@ -234,6 +257,18 @@ db.ref('votes').on('value', snap=>{
   document.getElementById('likeCount').innerText = d.likes||0;
   document.getElementById('dislikeCount').innerText = d.dislikes||0;
 });
+function checkUserVote(){
+  if(!currentUserUID) return;
+  db.ref('votes/users/'+currentUserUID).once('value').then(snap=>{
+    if(snap.exists()) markVoted(snap.val());
+  });
+}
+function markVoted(type){
+  document.getElementById('likeBtn').disabled = true;
+  document.getElementById('dislikeBtn').disabled = true;
+  if(type==='like') document.getElementById('likeBtn').classList.add('active-like');
+  if(type==='dislike') document.getElementById('dislikeBtn').classList.add('active-dislike');
+}
 
 // --- Коментарі ---
 function sendComment(){
@@ -248,39 +283,19 @@ function sendComment(){
   });
   document.getElementById('commentInput').value='';
 }
-
 db.ref('comments').on('value', snap=>{
   latestComments = snap.val()||{};
   renderComments(latestComments);
 });
-
 function renderComments(c){
   const div = document.getElementById('commentsList');
   div.innerHTML='';
   Object.entries(c).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([k,cm])=>{
     const d = document.createElement('div'); d.className='comment';
-    let txt = `<strong>${cm.name}:</strong> ${cm.text}`;
-    if(cm.replies) Object.entries(cm.replies).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([rk,r])=>{
-      txt += `<br><em>${r.adminName} відповідає:</em> ${r.text}`;
-    });
-    d.innerHTML = txt;
-
-    if(cm.uid===currentUserUID){
-      const e = document.createElement('button'); e.innerText='Редагувати'; e.onclick=()=>editComment(k,cm.text); d.appendChild(e);
-    }
-    if(isAdmin){
-      const del = document.createElement('button'); del.innerText='Видалити'; del.onclick=()=>deleteComment(k); d.appendChild(del);
-      const rep = document.createElement('button'); rep.innerText='Відповісти'; rep.onclick=()=>replyComment(k,cm.name); d.appendChild(rep);
-    }
+    d.innerHTML = `<strong>${cm.name}:</strong> ${cm.text}`;
     div.appendChild(d);
   });
 }
-
-// --- Редагування/Видалення/Відповідь ---
-function editComment(id,old){const n=prompt("Редагувати:",old);if(n!==null) db.ref('comments/'+id+'/text').set(n);}
-function deleteComment(id){if(confirm("Видалити коментар?")) db.ref('comments/'+id).remove();}
-function replyComment(id,name){const r=prompt("Відповідь для "+name+":");if(r) db.ref('comments/'+id+'/replies').push().set({adminName:'Адмін',text:r,timestamp:Date.now()});}
 </script>
-
 </body>
 </html>
