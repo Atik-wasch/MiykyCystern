@@ -13,16 +13,12 @@
       height: 100%;
       font-family: 'Roboto', sans-serif;
       background: #f8f9fa;
-      touch-action: pan-x pan-y pinch-zoom; /* дозволяє переміщати і масштабувати пальцем */
-      -ms-touch-action: pan-x pan-y pinch-zoom;
       overflow: hidden;
     }
 
-    iframe {
+    #map {
       width: 100%;
       height: 100%;
-      border: 0;
-      touch-action: pan-x pan-y pinch-zoom; /* drag та pinch-to-zoom */
     }
 
     .author {
@@ -42,14 +38,46 @@
   </style>
 </head>
 <body>
-  <!-- Карта -->
-  <iframe 
-    src="https://www.google.com/maps/d/embed?mid=1iPeh09-QBdwPgwO0RH9uL7K_UrA-aIA&ehbc=2E312F&z=3&noprof=1">
-  </iframe>
+  <!-- Контейнер для карти -->
+  <div id="map"></div>
 
   <!-- Автор -->
   <div class="author">
     © 2025 | Автор: Андрій Мочурад
   </div>
+
+  <!-- Google Maps JS API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCMnpdpKhzsNHe0y2lyf_WBF0g1gU9eTg8"></script>
+  <script>
+    function initMap(lat, lng) {
+      const pos = { lat: lat, lng: lng };
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: pos,
+        zoom: 13
+      });
+      new google.maps.Marker({
+        position: pos,
+        map: map,
+        title: "Ви тут"
+      });
+    }
+
+    // Автоматичне визначення місця
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          initMap(position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          // Якщо відмовив у доступі – дефолт Україна
+          initMap(49.0, 32.0);
+          alert("Не вдалося визначити ваше місцезнаходження.");
+        }
+      );
+    } else {
+      initMap(49.0, 32.0); // fallback
+      alert("Ваш браузер не підтримує геолокацію.");
+    }
+  </script>
 </body>
 </html>
