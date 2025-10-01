@@ -2,10 +2,9 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Мийки цистерн – Карта з місцем</title>
+<title>Мийки цистерн – Карта</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <style>
   html, body { 
     margin:0; 
@@ -18,93 +17,18 @@
   iframe { width:100%; height:100%; border:0; }
   .author { 
     position:fixed; bottom:7px; left:50%; transform:translateX(-50%); 
-    font-size:13px; color:#fff; background:#000; padding:6px 4px; 
+    font-size:13px; color:#f30e0e; padding:6px 4px; 
     border-radius:6px; font-weight:bold; z-index:1001; text-align:center; 
-  }
-  .btn-location {
-    position:fixed; top:11px; left:230px; /* кнопка у верхньому лівому куті */
-    z-index:1002;
-    padding:12px 7px; 
-    background:#0d9488; 
-    color:#fff; 
-    border:none; 
-    border-radius:6px; 
-    font-weight:bold; 
-    cursor:pointer;
-  }
-  #mapModal {
-    display:none;
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.7); z-index:1003;
-  }
-  #mapContainer {
-    width:90%; height:80%; background:#fff; border-radius:8px;
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  }
-  #leafletMap { width:100%; height:100%; border-radius:8px; }
-  .closeBtn {
-    position:absolute; top:5px; right:10px; z-index:1004; 
-    background:#ff4d4d; color:#fff; border:none; border-radius:4px; 
-    padding:4px 8px; cursor:pointer; font-weight:bold;
   }
 </style>
 </head>
 <body>
 
-<!-- Основна карта Zeemaps -->
-<iframe src="https://www.google.com/maps/d/embed?mid=1iPeh09-QBdwPgwO0RH9uL7K_UrA-aIA&ehbc=2E312F&noprof=1" width="640" height="480"></iframe>
+<!-- Основна карта -->
+<iframe src="https://www.google.com/maps/d/embed?mid=1iPeh09-QBdwPgwO0RH9uL7K_UrA-aIA&ehbc=2E312F&noprof=1"></iframe>
 
 <!-- Автор -->
 <div class="author">© 2025 | Автор: Андрій Мочурад</div>
 
-<!-- Кнопка показати моє місце -->
-<button class="btn-location" id="showLocationBtn">Моє місце</button>
-
-<!-- Модальне вікно з Leaflet картою -->
-<div id="mapModal">
-  <div id="mapContainer">
-    <button class="closeBtn" id="closeMapBtn">Закрити</button>
-    <div id="leafletMap"></div>
-  </div>
-</div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  const showBtn = document.getElementById('showLocationBtn');
-  const mapModal = document.getElementById('mapModal');
-  const closeBtn = document.getElementById('closeMapBtn');
-  let leafletMap;
-
-  showBtn.addEventListener('click', ()=>{
-    mapModal.style.display = 'block';
-
-    // Ініціалізація карти тільки один раз
-    if(!leafletMap){
-      leafletMap = L.map('leafletMap').setView([49,32],6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom:19,
-        attribution:'&copy; OpenStreetMap'
-      }).addTo(leafletMap);
-
-      // Визначення місцезнаходження користувача
-      leafletMap.locate({setView:true, maxZoom:15});
-      leafletMap.on('locationfound', function(e){
-        var radius = e.accuracy/2;
-        L.marker(e.latlng).addTo(leafletMap).bindPopup("Ви тут!").openPopup();
-        L.circle(e.latlng, radius).addTo(leafletMap);
-      });
-      leafletMap.on('locationerror', function(e){
-        alert("Не вдалося визначити місце: " + e.message);
-      });
-    }
-  });
-
-  closeBtn.addEventListener('click', ()=>{
-    mapModal.style.display = 'none';
-  });
-</script>
-
 </body>
 </html>
-
-
